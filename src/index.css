@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  overflow-y: scroll; /* Always enable natural native vertical scroll */
+}
+
+body {
+  background-color: #0A0D14;
+  color: #E2E8F0;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Accessible, easy-to-drag scrollbar for desktop & laptop */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0A0D14;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+  border: 2px solid #0A0D14;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #10B981;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #059669;
+}
+
+/* Firefox standard scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #334155 #0A0D14;
+}
+
+/* Soft selection highlight */
+::selection {
+  background-color: rgba(16, 185, 129, 0.25);
+  color: #F8FAFC;
+}
+
+/* Glass & Glow utilities */
+.glass-panel {
+  background: rgba(18, 24, 38, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.glass-panel-glow-emerald {
+  box-shadow: 0 0 25px -5px rgba(16, 185, 129, 0.08);
+}
+
+.glass-panel-glow-rose {
+  box-shadow: 0 0 25px -5px rgba(244, 63, 94, 0.08);
+}
+
+.glass-panel-glow-amber {
+  box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.08);
+}
+
+/* GPU Hardware Acceleration for ultra-smooth transitions */
+.smooth-gpu {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+/* Safe areas for iPhone notch & modern Android devices */
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+}
+
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), 12px);
+}
+

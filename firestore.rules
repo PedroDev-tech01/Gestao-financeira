@@ -1,0 +1,130 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Health check endpoint for connection verification
+    match /test/{testDocId} {
+      allow get: if true;
+    }
+
+    // Global hardened security helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    // Entity Validation: UserProfile
+    function isValidUserProfile(data, userId) {
+      return data.keys().hasAll(['id', 'displayName']) &&
+             data.keys().hasOnly(['id', 'displayName', 'email', 'cpf', 'monthlyBudget', 'hideBalance', 'createdAt', 'updatedAt']) &&
+             data.id == userId &&
+             data.displayName is string && data.displayName.size() > 0 && data.displayName.size() <= 120 &&
+             (!('email' in data) || (data.email is string && data.email.size() <= 256)) &&
+             (!('cpf' in data) || (data.cpf is string && data.cpf.size() <= 20)) &&
+             (!('monthlyBudget' in data) || (data.monthlyBudget is number && data.monthlyBudget >= 0)) &&
+             (!('hideBalance' in data) || data.hideBalance is bool);
+    }
+
+    // Entity Validation: Transaction
+    function isValidTransaction(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'description', 'amount', 'type', 'category', 'date']) &&
+             data.keys().hasOnly(['id', 'userId', 'description', 'amount', 'type', 'category', 'date', 'paymentMethod', 'status', 'expenseClassification', 'notes', 'createdAt', 'updatedAt', 'scope', 'installmentInfo']) &&
+             data.userId == userId &&
+             data.id is string && data.id.size() <= 128 &&
+             data.description is string && data.description.size() > 0 && data.description.size() <= 200 &&
+             data.amount is number && data.amount >= 0 &&
+             (data.type == 'income' || data.type == 'expense') &&
+             data.category is string && data.category.size() <= 80 &&
+             data.date is string && data.date.size() <= 10 &&
+             (!('paymentMethod' in data) || (data.paymentMethod is string && data.paymentMethod.size() <= 30)) &&
+             (!('status' in data) || (data.status == 'paid' || data.status == 'pending')) &&
+             (!('expenseClassification' in data) || (data.expenseClassification == 'essential' || data.expenseClassification == 'lifestyle')) &&
+             (!('scope' in data) || data.scope == 'personal') &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 500));
+    }
+
+    // Entity Validation: Debt
+    function isValidDebt(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'title', 'totalAmount', 'paidAmount', 'status']) &&
+             data.keys().hasOnly(['id', 'userId', 'title', 'creditor', 'totalAmount', 'paidAmount', 'interestRate', 'dueDate', 'status', 'notes', 'createdAt', 'updatedAt', 'paymentHistory']) &&
+             data.userId == userId &&
+             data.id is string && data.id.size() <= 128 &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.totalAmount is number && data.totalAmount >= 0 &&
+             data.paidAmount is number && data.paidAmount >= 0 &&
+             (data.status == 'active' || data.status == 'negotiating' || data.status == 'paid') &&
+             (!('creditor' in data) || (data.creditor is string && data.creditor.size() <= 100)) &&
+             (!('interestRate' in data) || data.interestRate is number) &&
+             (!('dueDate' in data) || (data.dueDate is string && data.dueDate.size() <= 10)) &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 500)) &&
+             (!('paymentHistory' in data) || (data.paymentHistory is list && data.paymentHistory.size() <= 50));
+    }
+
+    // Entity Validation: Investment
+    function isValidInvestment(data, userId) {
+      return data.keys().hasAll(['id', 'userId', 'title', 'category', 'investedAmount', 'currentValue']) &&
+             data.keys().hasOnly(['id', 'userId', 'title', 'category', 'institution', 'investedAmount', 'currentValue', 'targetAmount', 'yieldRate', 'notes', 'updatedAt', 'createdAt', 'history']) &&
+             data.userId == userId &&
+             data.id is string && data.id.size() <= 128 &&
+             data.title is string && data.title.size() > 0 && data.title.size() <= 200 &&
+             data.category is string && data.category.size() <= 50 &&
+             (!('institution' in data) || (data.institution is string && data.institution.size() <= 100)) &&
+             data.investedAmount is number && data.investedAmount >= 0 &&
+             data.currentValue is number && data.currentValue >= 0 &&
+             (!('targetAmount' in data) || (data.targetAmount is number && data.targetAmount >= 0)) &&
+             (!('yieldRate' in data) || (data.yieldRate is string && data.yieldRate.size() <= 50)) &&
+             (!('notes' in data) || (data.notes is string && data.notes.size() <= 500)) &&
+             (!('history' in data) || (data.history is list && data.history.size() <= 100));
+    }
+
+    // Match /users/{userId}
+    match /users/{userId} {
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow create: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming(), userId);
+      allow update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming(), userId) && incoming().id == existing().id;
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      // Match /users/{userId}/transactions/{transactionId}
+      match /transactions/{transactionId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(transactionId);
+        allow list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(transactionId) && isValidTransaction(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(transactionId) && isValidTransaction(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(transactionId);
+      }
+
+      // Match /users/{userId}/debts/{debtId}
+      match /debts/{debtId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(debtId);
+        allow list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(debtId) && isValidDebt(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(debtId) && isValidDebt(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(debtId);
+      }
+
+      // Match /users/{userId}/investments/{investmentId}
+      match /investments/{investmentId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(investmentId);
+        allow list: if isOwner(userId) && isValidId(userId);
+        allow create: if isOwner(userId) && isValidId(userId) && isValidId(investmentId) && isValidInvestment(incoming(), userId);
+        allow update: if isOwner(userId) && isValidId(userId) && isValidId(investmentId) && isValidInvestment(incoming(), userId) && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(investmentId);
+      }
+    }
+  }
+}

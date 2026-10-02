@@ -1,0 +1,6 @@
+{
+  "name": "AquiGastos",
+  "description": "Controle financeiro simples, didático e premium para qualquer idade, com gestão de receitas e despesas parceladas, carteira de investimentos e reserva de emergência, controle de dívidas e inteligência financeira 50/30/20.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

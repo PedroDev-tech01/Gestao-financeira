@@ -1,0 +1,249 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User account profile and preferences",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Firebase Auth UID of the user",
+          "maxLength": 128
+        },
+        "email": {
+          "type": "string",
+          "description": "User email address",
+          "maxLength": 256
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name",
+          "maxLength": 120
+        },
+        "cpf": {
+          "type": "string",
+          "description": "Masked or digits-only CPF",
+          "maxLength": 20
+        },
+        "monthlyBudget": {
+          "type": "number",
+          "description": "Target monthly spending budget in BRL"
+        },
+        "hideBalance": {
+          "type": "boolean",
+          "description": "Privacy preference to obscure balances"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "ISO timestamp of account creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "ISO timestamp of last profile update"
+        }
+      },
+      "required": ["id", "displayName"]
+    },
+    "Transaction": {
+      "title": "Transaction",
+      "description": "Financial income or expense record",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique transaction document identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "description": {
+          "type": "string",
+          "description": "Transaction description or merchant",
+          "maxLength": 200,
+          "minLength": 1
+        },
+        "amount": {
+          "type": "number",
+          "description": "Monetary value in BRL (positive number)"
+        },
+        "type": {
+          "type": "string",
+          "description": "Transaction type: income or expense",
+          "enum": ["income", "expense"]
+        },
+        "category": {
+          "type": "string",
+          "description": "Transaction category label",
+          "maxLength": 80
+        },
+        "date": {
+          "type": "string",
+          "description": "Transaction date in YYYY-MM-DD format",
+          "maxLength": 10
+        },
+        "paymentMethod": {
+          "type": "string",
+          "description": "Payment instrument used",
+          "maxLength": 30
+        },
+        "status": {
+          "type": "string",
+          "description": "Settlement state: paid or pending",
+          "enum": ["paid", "pending"]
+        },
+        "expenseClassification": {
+          "type": "string",
+          "description": "Classification: essential or lifestyle",
+          "enum": ["essential", "lifestyle"]
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes or tags",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of creation"
+        }
+      },
+      "required": ["id", "userId", "description", "amount", "type", "category", "date"]
+    },
+    "DebtItem": {
+      "title": "DebtItem",
+      "description": "Debt or loan tracking record",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique debt document identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "description": "Title or nature of the debt",
+          "maxLength": 200,
+          "minLength": 1
+        },
+        "creditor": {
+          "type": "string",
+          "description": "Creditor or bank name",
+          "maxLength": 100
+        },
+        "totalAmount": {
+          "type": "number",
+          "description": "Total original or negotiated amount in BRL"
+        },
+        "paidAmount": {
+          "type": "number",
+          "description": "Amount amortized or paid so far in BRL"
+        },
+        "interestRate": {
+          "type": "number",
+          "description": "Monthly interest rate percentage"
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "Due date in YYYY-MM-DD format",
+          "maxLength": 10
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the debt",
+          "enum": ["active", "negotiating", "paid"]
+        },
+        "notes": {
+          "type": "string",
+          "description": "Renegotiation details or notes",
+          "maxLength": 500
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        }
+      },
+      "required": ["id", "userId", "title", "totalAmount", "paidAmount", "status"]
+    },
+    "InvestmentItem": {
+      "title": "InvestmentItem",
+      "description": "Investment position or portfolio asset",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique investment document identifier",
+          "maxLength": 128
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner user UID",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "description": "Name of asset or fund",
+          "maxLength": 200,
+          "minLength": 1
+        },
+        "category": {
+          "type": "string",
+          "description": "Asset category class",
+          "maxLength": 50
+        },
+        "institution": {
+          "type": "string",
+          "description": "Broker or bank custody",
+          "maxLength": 100
+        },
+        "investedAmount": {
+          "type": "number",
+          "description": "Cumulative principal invested in BRL"
+        },
+        "currentValue": {
+          "type": "number",
+          "description": "Current market valuation in BRL"
+        },
+        "yieldRate": {
+          "type": "string",
+          "description": "Yield benchmark or indicator",
+          "maxLength": 50
+        },
+        "notes": {
+          "type": "string",
+          "description": "Notes or strategy",
+          "maxLength": 500
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["id", "userId", "title", "category", "institution", "investedAmount", "currentValue"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile, budget preferences and balance visibility"
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": "Transaction",
+      "description": "Individual transactions belonging to a specific user"
+    },
+    "/users/{userId}/debts/{debtId}": {
+      "schema": "DebtItem",
+      "description": "Debt records belonging to a specific user"
+    },
+    "/users/{userId}/investments/{investmentId}": {
+      "schema": "InvestmentItem",
+      "description": "Investment assets and valuations belonging to a specific user"
+    }
+  }
+}
