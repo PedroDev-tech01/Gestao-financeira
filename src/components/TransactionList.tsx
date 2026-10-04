@@ -150,11 +150,11 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           )}
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-1 bg-[#0A0D14] p-1 rounded-xl border border-slate-800/80 shrink-0 overflow-x-auto">
+        {/* Filter Pills - Responsive Flex Wrap (Never force horizontal scroll) */}
+        <div className="flex flex-wrap items-center gap-1.5 bg-[#0A0D14] p-1.5 rounded-2xl border border-slate-800/80 w-full lg:w-auto">
           <button
             onClick={() => setTypeFilter('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               typeFilter === 'all'
                 ? 'bg-slate-800 text-white shadow-xs'
                 : 'text-slate-400 hover:text-slate-200'
@@ -164,7 +164,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </button>
           <button
             onClick={() => setTypeFilter('income')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               typeFilter === 'income'
                 ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/50 shadow-xs'
                 : 'text-slate-400 hover:text-emerald-400'
@@ -174,7 +174,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </button>
           <button
             onClick={() => setTypeFilter('expense')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               typeFilter === 'expense'
                 ? 'bg-rose-950/60 text-rose-300 border border-rose-800/50 shadow-xs'
                 : 'text-slate-400 hover:text-rose-400'
@@ -184,7 +184,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </button>
           <button
             onClick={() => setTypeFilter('pending')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               typeFilter === 'pending'
                 ? 'bg-amber-950/60 text-amber-300 border border-amber-800/50 shadow-xs'
                 : 'text-slate-400 hover:text-amber-400'
@@ -194,7 +194,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </button>
           <button
             onClick={() => setTypeFilter('essential')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               typeFilter === 'essential'
                 ? 'bg-blue-950/60 text-blue-300 border border-blue-800/50 shadow-xs'
                 : 'text-slate-400 hover:text-blue-400'
@@ -204,7 +204,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           </button>
           <button
             onClick={() => setTypeFilter('lifestyle')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
               typeFilter === 'lifestyle'
                 ? 'bg-purple-950/60 text-purple-300 border border-purple-800/50 shadow-xs'
                 : 'text-slate-400 hover:text-purple-400'

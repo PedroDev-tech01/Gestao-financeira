@@ -15,6 +15,7 @@ export interface UserProfileData {
   id: string;
   displayName: string;
   email?: string;
+  photoURL?: string;
   cpf?: string;
   monthlyBudget?: number;
   hideBalance?: boolean;
@@ -301,7 +302,8 @@ export async function saveUserProfile(userId: string, profile: Partial<UserProfi
   };
 
   if (profile.email) payload.email = profile.email.slice(0, 256);
-  if (profile.cpf) payload.cpf = profile.cpf.slice(0, 20);
+  if (profile.photoURL) payload.photoURL = profile.photoURL.slice(0, 1000);
+  if (profile.cpf) payload.cpf = profile.cpf.slice(0, 60);
   if (profile.monthlyBudget !== undefined) payload.monthlyBudget = Number(profile.monthlyBudget);
   if (profile.hideBalance !== undefined) payload.hideBalance = Boolean(profile.hideBalance);
   if (profile.createdAt) payload.createdAt = profile.createdAt;
@@ -343,62 +345,65 @@ export async function syncLocalDataToFirestore(
   const batch = writeBatch(db);
 
   for (const tx of localTransactions) {
+    if (!tx || !tx.id) continue;
     const ref = doc(db, 'users', userId, 'transactions', tx.id);
     const data: Record<string, any> = {
       id: tx.id,
       userId,
-      description: tx.description.slice(0, 200),
-      amount: Number(tx.amount),
-      type: tx.type,
-      category: tx.category.slice(0, 80),
-      date: tx.date,
-      status: tx.status || 'paid',
+      description: (tx.description || 'Lançamento').slice(0, 200),
+      amount: Number(tx.amount) || 0,
+      type: tx.type === 'income' ? 'income' : 'expense',
+      category: (tx.category || 'Geral').slice(0, 80),
+      date: (tx.date || new Date().toISOString().slice(0, 10)).slice(0, 40),
+      status: tx.status === 'pending' ? 'pending' : 'paid',
       updatedAt: new Date().toISOString(),
     };
-    if (tx.paymentMethod) data.paymentMethod = tx.paymentMethod;
+    if (tx.paymentMethod) data.paymentMethod = String(tx.paymentMethod).slice(0, 30);
     if (tx.scope) data.scope = tx.scope;
-    if (tx.notes) data.notes = tx.notes.slice(0, 500);
+    if (tx.notes) data.notes = String(tx.notes).slice(0, 500);
     if (tx.installmentInfo) data.installmentInfo = tx.installmentInfo;
     batch.set(ref, data, { merge: true });
     count++;
   }
 
   for (const debt of localDebts) {
+    if (!debt || !debt.id) continue;
     const ref = doc(db, 'users', userId, 'debts', debt.id);
     const data: Record<string, any> = {
       id: debt.id,
       userId,
-      title: debt.title.slice(0, 200),
-      totalAmount: Number(debt.totalAmount),
-      paidAmount: Number(debt.paidAmount),
+      title: (debt.title || 'Dívida').slice(0, 200),
+      totalAmount: Number(debt.totalAmount) || 0,
+      paidAmount: Number(debt.paidAmount) || 0,
       status: debt.status || 'active',
       createdAt: debt.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    if (debt.creditor) data.creditor = debt.creditor.slice(0, 100);
-    if (debt.dueDate) data.dueDate = debt.dueDate;
-    if (debt.notes) data.notes = debt.notes.slice(0, 500);
+    if (debt.creditor) data.creditor = String(debt.creditor).slice(0, 100);
+    if (debt.dueDate) data.dueDate = String(debt.dueDate).slice(0, 40);
+    if (debt.notes) data.notes = String(debt.notes).slice(0, 500);
     if (debt.paymentHistory) data.paymentHistory = debt.paymentHistory;
     batch.set(ref, data, { merge: true });
     count++;
   }
 
   for (const inv of localInvestments) {
+    if (!inv || !inv.id) continue;
     const ref = doc(db, 'users', userId, 'investments', inv.id);
     const data: Record<string, any> = {
       id: inv.id,
       userId,
-      title: inv.title.slice(0, 200),
-      category: inv.category,
+      title: (inv.title || 'Investimento').slice(0, 200),
+      category: inv.category || 'Outros',
       institution: (inv.institution || 'Geral').slice(0, 100),
-      investedAmount: Number(inv.investedAmount),
-      currentValue: Number(inv.currentValue),
+      investedAmount: Number(inv.investedAmount) || 0,
+      currentValue: Number(inv.currentValue) || 0,
       createdAt: inv.createdAt || new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
     if (inv.targetAmount !== undefined) data.targetAmount = Number(inv.targetAmount);
-    if (inv.yieldRate) data.yieldRate = inv.yieldRate.slice(0, 50);
-    if (inv.notes) data.notes = inv.notes.slice(0, 500);
+    if (inv.yieldRate) data.yieldRate = String(inv.yieldRate).slice(0, 50);
+    if (inv.notes) data.notes = String(inv.notes).slice(0, 500);
     if (inv.history) data.history = inv.history;
     batch.set(ref, data, { merge: true });
     count++;

@@ -275,100 +275,101 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
           </div>
         ) : (
           /* STANDARD HEADER LAYOUT */
-          <div className="flex items-center justify-between gap-2 sm:gap-4">
-            
-            {/* Brand Logo & User Info */}
-            <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-              <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl overflow-hidden shadow-xs border border-emerald-500/20 bg-[#0E131F] flex items-center justify-center">
-                {userPhotoURL ? (
-                  <img
-                    src={userPhotoURL}
-                    alt={userName}
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <img
-                    src="/icon.svg"
-                    alt="AquiGastos Logo"
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
-                )}
-              </div>
-              <div>
-                <div className="flex items-center gap-1.5 sm:gap-2">
-                  <span className="text-sm sm:text-base font-extrabold tracking-tight text-slate-100">
-                    Aqui<span className="text-emerald-400">Gastos</span>
-                  </span>
-                  {isCloudSynced ? (
-                    <span
-                      className="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-bold px-1.5 py-0.5 rounded-md bg-emerald-950/60 border border-emerald-500/30"
-                      title="Sincronizado na Nuvem Firebase Firestore"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      <Cloud size={10} />
-                      <span className="hidden sm:inline">Nuvem</span>
-                    </span>
+          <div>
+            <div className="flex items-center justify-between gap-2 sm:gap-4">
+              
+              {/* Brand Logo & User Info */}
+              <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl overflow-hidden shadow-xs border border-emerald-500/20 bg-[#0E131F] flex items-center justify-center">
+                  {userPhotoURL ? (
+                    <img
+                      src={userPhotoURL}
+                      alt={userName}
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
                   ) : (
-                    <span className="hidden sm:inline-block text-[10px] text-slate-400 font-medium px-1.5 py-0.5 rounded-md bg-slate-800/60 border border-slate-700/50">
-                      Local
-                    </span>
+                    <img
+                      src="/icon.svg"
+                      alt="AquiGastos Logo"
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
                   )}
                 </div>
-                {userEmail ? (
-                  <div className="hidden sm:flex items-center gap-1 text-[10px] text-slate-400 mt-0.5 truncate max-w-[150px]">
-                    <span className="truncate">{userEmail}</span>
+                <div>
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <span className="text-sm sm:text-base font-extrabold tracking-tight text-slate-100">
+                      Aqui<span className="text-emerald-400">Gastos</span>
+                    </span>
+                    {isCloudSynced ? (
+                      <span
+                        className="inline-flex items-center gap-1 text-[10px] text-emerald-400 font-bold px-1.5 py-0.5 rounded-md bg-emerald-950/60 border border-emerald-500/30"
+                        title="Sincronizado na Nuvem Firebase Firestore"
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <Cloud size={10} />
+                        <span className="hidden sm:inline">Nuvem</span>
+                      </span>
+                    ) : (
+                      <span className="hidden sm:inline-block text-[10px] text-slate-400 font-medium px-1.5 py-0.5 rounded-md bg-slate-800/60 border border-slate-700/50">
+                        Local
+                      </span>
+                    )}
                   </div>
-                ) : userCpf ? (
-                  <div className="hidden sm:flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
-                    <User size={10} className="text-emerald-400" />
-                    <span>CPF: {maskCPF(userCpf)}</span>
-                  </div>
-                ) : null}
+                  {userEmail ? (
+                    <div className="hidden sm:flex items-center gap-1 text-[10px] text-slate-400 mt-0.5 truncate max-w-[150px]">
+                      <span className="truncate">{userEmail}</span>
+                    </div>
+                  ) : userCpf ? (
+                    <div className="hidden sm:flex items-center gap-1 text-[10px] text-slate-400 mt-0.5">
+                      <User size={10} className="text-emerald-400" />
+                      <span>CPF: {maskCPF(userCpf)}</span>
+                    </div>
+                  ) : null}
+                </div>
               </div>
-            </div>
 
-            {/* Month Navigator - Center with Click-to-Jump */}
-            <div className="flex items-center bg-[#0A0D14] rounded-xl p-0.5 border border-slate-800/80 shadow-xs">
-              <button
-                id="btn-prev-month"
-                onClick={() => onChangeMonth(getPreviousMonth(currentMonth))}
-                className="p-1.5 sm:p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 min-h-[36px] min-w-[36px] flex items-center justify-center"
-                title="Voltar para o mês anterior (Atalho: ←)"
+              {/* Month Navigator - Center on Tablets & Desktops */}
+              <div className="hidden md:flex items-center bg-[#0A0D14] rounded-xl p-0.5 border border-slate-800/80 shadow-xs shrink-0">
+                <button
+                  id="btn-prev-month"
+                  onClick={() => onChangeMonth(getPreviousMonth(currentMonth))}
+                  className="p-1.5 sm:p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 min-h-[36px] min-w-[36px] flex items-center justify-center"
+                  title="Voltar para o mês anterior (Atalho: ←)"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+
+                <button
+                  id="btn-open-month-picker"
+                  onClick={onOpenMonthPicker}
+                  className="flex items-center gap-1 px-2 sm:px-3 text-xs sm:text-sm font-bold text-slate-200 min-w-[105px] sm:min-w-[135px] justify-center select-none hover:text-emerald-400 hover:bg-slate-800/50 rounded-lg py-1 transition-colors cursor-pointer group"
+                  title="Clique para escolher qualquer mês ou voltar para hoje"
+                >
+                  <Calendar size={13} className="text-emerald-400 hidden sm:inline" />
+                  <span className="truncate">{getMonthNameAndYear(currentMonth)}</span>
+                  <ChevronDown
+                    size={12}
+                    className="text-slate-500 group-hover:text-emerald-400 transition-colors shrink-0"
+                  />
+                </button>
+
+                <button
+                  id="btn-next-month"
+                  onClick={() => onChangeMonth(getNextMonth(currentMonth))}
+                  className="p-1.5 sm:p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 min-h-[36px] min-w-[36px] flex items-center justify-center"
+                  title="Avançar para o próximo mês (Atalho: →)"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
+
+              {/* DESKTOP SEARCH BAR (Tablets & Desktops) */}
+              <div
+                ref={searchContainerRef}
+                className="hidden md:block relative flex-1 max-w-xs lg:max-w-sm"
               >
-                <ChevronLeft size={16} />
-              </button>
-
-              <button
-                id="btn-open-month-picker"
-                onClick={onOpenMonthPicker}
-                className="flex items-center gap-1 px-2 sm:px-3 text-xs sm:text-sm font-bold text-slate-200 min-w-[105px] sm:min-w-[135px] justify-center select-none hover:text-emerald-400 hover:bg-slate-800/50 rounded-lg py-1 transition-colors cursor-pointer group"
-                title="Clique para escolher qualquer mês ou voltar para hoje"
-              >
-                <Calendar size={13} className="text-emerald-400 hidden sm:inline" />
-                <span className="truncate">{getMonthNameAndYear(currentMonth)}</span>
-                <ChevronDown
-                  size={12}
-                  className="text-slate-500 group-hover:text-emerald-400 transition-colors shrink-0"
-                />
-              </button>
-
-              <button
-                id="btn-next-month"
-                onClick={() => onChangeMonth(getNextMonth(currentMonth))}
-                className="p-1.5 sm:p-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 min-h-[36px] min-w-[36px] flex items-center justify-center"
-                title="Avançar para o próximo mês (Atalho: →)"
-              >
-                <ChevronRight size={16} />
-              </button>
-            </div>
-
-            {/* DESKTOP SEARCH BAR (Tablets & Desktops) */}
-            <div
-              ref={searchContainerRef}
-              className="hidden md:block relative flex-1 max-w-xs lg:max-w-sm"
-            >
               <div className="relative">
                 <Search
                   size={14}
@@ -556,6 +557,42 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
             </div>
 
           </div>
+
+          {/* Dedicated Clean Mobile Month Navigator Row */}
+          <div className="md:hidden mt-2.5 flex items-center justify-between bg-[#0A0D14] rounded-xl p-1 border border-slate-800/80 shadow-xs w-full">
+            <button
+              id="btn-prev-month-mobile"
+              onClick={() => onChangeMonth(getPreviousMonth(currentMonth))}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 min-h-[34px] min-w-[34px] flex items-center justify-center shrink-0"
+              title="Voltar para o mês anterior"
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            <button
+              id="btn-open-month-picker-mobile"
+              onClick={onOpenMonthPicker}
+              className="flex items-center gap-1.5 px-2 text-xs font-bold text-slate-200 justify-center select-none hover:text-emerald-400 transition-colors cursor-pointer group flex-1 truncate"
+              title="Clique para escolher qualquer mês ou voltar para hoje"
+            >
+              <Calendar size={13} className="text-emerald-400 shrink-0" />
+              <span className="truncate">{getMonthNameAndYear(currentMonth)}</span>
+              <ChevronDown
+                size={12}
+                className="text-slate-500 group-hover:text-emerald-400 transition-colors shrink-0"
+              />
+            </button>
+
+            <button
+              id="btn-next-month-mobile"
+              onClick={() => onChangeMonth(getNextMonth(currentMonth))}
+              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer active:scale-95 min-h-[34px] min-w-[34px] flex items-center justify-center shrink-0"
+              title="Avançar para o próximo mês"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
         )}
 
       </div>

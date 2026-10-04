@@ -299,6 +299,8 @@ export default function App() {
           await saveUserProfile(fbUser.uid, {
             displayName: cloudUser.name,
             email: cloudUser.email,
+            photoURL: cloudUser.photoURL,
+            cpf: userCpf && !userCpf.includes('@') ? userCpf : undefined,
             hideBalance,
           });
         } catch (e) {
@@ -811,7 +813,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0C10] text-slate-100 antialiased font-sans pb-28 sm:pb-16 w-full">
+    <div className="min-h-screen bg-[#0A0C10] text-slate-100 antialiased font-sans pb-28 sm:pb-16 w-full max-w-full overflow-x-hidden">
       
       {/* Toast Notification System */}
       <ToastNotification toasts={toasts} onDismiss={removeToast} />
@@ -974,7 +976,7 @@ export default function App() {
           </div>
 
           {/* Quick Action in Tab Bar */}
-          <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full lg:w-auto">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full lg:w-auto">
             <button
               onClick={() => handleOpenNewTransaction('income')}
               className="justify-center text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950/30 hover:bg-emerald-900/40 border border-emerald-800/40 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 cursor-pointer active:scale-95"

@@ -388,10 +388,10 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
 
       {/* 4. ACTIONS & CATEGORY FILTER TABS */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-        <div className="flex items-center gap-1.5 overflow-x-auto p-1 bg-[#0A0D14] rounded-2xl border border-slate-800/80 shadow-xs">
+        <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-[#0A0D14] rounded-2xl border border-slate-800/80 shadow-xs w-full sm:w-auto">
           <button
             onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
               filter === 'all'
                 ? 'bg-slate-800 text-white shadow-xs border border-slate-700/60'
                 : 'text-slate-400 hover:text-slate-200'
@@ -401,7 +401,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
           </button>
           <button
             onClick={() => setFilter('emergency_fund')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
               filter === 'emergency_fund'
                 ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60 shadow-xs'
                 : 'text-slate-400 hover:text-emerald-300'
@@ -411,7 +411,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
           </button>
           <button
             onClick={() => setFilter('fixed_income')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
               filter === 'fixed_income'
                 ? 'bg-blue-950/60 text-blue-300 border border-blue-800/60 shadow-xs'
                 : 'text-slate-400 hover:text-blue-300'
@@ -421,7 +421,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
           </button>
           <button
             onClick={() => setFilter('variable_income')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
               filter === 'variable_income'
                 ? 'bg-purple-950/60 text-purple-300 border border-purple-800/60 shadow-xs'
                 : 'text-slate-400 hover:text-purple-300'
@@ -431,7 +431,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
           </button>
           <button
             onClick={() => setFilter('crypto')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap active:scale-95 ${
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
               filter === 'crypto'
                 ? 'bg-orange-950/60 text-orange-300 border border-orange-800/60 shadow-xs'
                 : 'text-slate-400 hover:text-orange-300'

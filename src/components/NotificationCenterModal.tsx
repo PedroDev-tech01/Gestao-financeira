@@ -254,11 +254,11 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
           </div>
         )}
 
-        {/* Filter Navigation Chips */}
-        <div className="px-5 sm:px-6 pt-3 pb-2 flex items-center gap-1.5 overflow-x-auto border-b border-slate-800/60 no-scrollbar">
+        {/* Filter Navigation Chips - Responsive Flex Wrap */}
+        <div className="px-5 sm:px-6 pt-3 pb-2 flex flex-wrap items-center gap-1.5 border-b border-slate-800/60">
           <button
             onClick={() => setActiveFilter('all')}
-            className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all shrink-0 cursor-pointer ${
+            className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
               activeFilter === 'all'
                 ? 'bg-slate-200 text-slate-900 shadow-sm'
                 : 'bg-[#0A0D14] text-slate-400 hover:text-slate-200 border border-slate-800'
@@ -270,7 +270,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
           {overdueCount > 0 && (
             <button
               onClick={() => setActiveFilter('overdue')}
-              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
+              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeFilter === 'overdue'
                   ? 'bg-rose-500 text-white shadow-sm shadow-rose-950/50'
                   : 'bg-rose-950/40 text-rose-300 border border-rose-800/40 hover:bg-rose-900/50'
@@ -284,7 +284,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
           {todayCount > 0 && (
             <button
               onClick={() => setActiveFilter('today')}
-              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
+              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeFilter === 'today'
                   ? 'bg-amber-500 text-slate-950 shadow-sm shadow-amber-950/50'
                   : 'bg-amber-950/40 text-amber-300 border border-amber-800/40 hover:bg-amber-900/50'
@@ -298,7 +298,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
           {upcomingCount > 0 && (
             <button
               onClick={() => setActiveFilter('upcoming')}
-              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all shrink-0 flex items-center gap-1.5 cursor-pointer ${
+              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeFilter === 'upcoming'
                   ? 'bg-sky-500 text-slate-950 shadow-sm shadow-sky-950/50'
                   : 'bg-sky-950/40 text-sky-300 border border-sky-800/40 hover:bg-sky-900/50'
