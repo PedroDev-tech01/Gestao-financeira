@@ -349,84 +349,110 @@ export async function getUserProfile(userId: string): Promise<UserProfileData | 
 }
 
 /**
- * Batch upload / sync existing local storage data to user's Firestore cloud account
+ * Envia para a nuvem os dados que estavam salvos só neste aparelho (contas antigas por CPF).
+ *
+ * Regras de segurança dos dados:
+ * - NUNCA sobrescreve um item que já existe na nuvem (compara pelo ID). Se o usuário entrar
+ *   numa conta que já tem dados, os itens da nuvem são mantidos e só os que faltam são enviados.
+ * - Divide em lotes de até 400 operações (o limite do Firestore é 500 por lote).
+ * - Não apaga nada do armazenamento local; quem chama decide o que fazer depois.
  */
 export async function syncLocalDataToFirestore(
   userId: string,
   localTransactions: Transaction[],
   localDebts: DebtItem[],
   localInvestments: InvestmentItem[]
-): Promise<{ count: number }> {
-  let count = 0;
-  // Use sequential saves or batches (up to 500 ops)
-  const batch = writeBatch(db);
+): Promise<{ count: number; skipped: number }> {
+  const BATCH_LIMIT = 400;
 
-  for (const tx of localTransactions) {
+  const existingIds = async (sub: 'transactions' | 'debts' | 'investments') => {
+    try {
+      const snap = await getDocs(collection(db, 'users', userId, sub));
+      return new Set(snap.docs.map((d) => d.id));
+    } catch (error) {
+      handleFirestoreError(error, OperationType.LIST, `users/${userId}/${sub}`);
+    }
+  };
+
+  const [txIds, debtIds, invIds] = await Promise.all([
+    existingIds('transactions'),
+    existingIds('debts'),
+    existingIds('investments'),
+  ]);
+
+  const writes: { sub: string; id: string; data: Record<string, any> }[] = [];
+  let skipped = 0;
+  const now = new Date().toISOString();
+
+  for (const tx of localTransactions || []) {
     if (!tx || !tx.id) continue;
-    const ref = doc(db, 'users', userId, 'transactions', tx.id);
+    if (txIds.has(tx.id)) { skipped++; continue; }
     const data: Record<string, any> = {
       id: tx.id,
       userId,
-      description: (tx.description || 'Lançamento').slice(0, 200),
-      amount: Number(tx.amount) || 0,
+      description: String(tx.description || 'Lançamento').slice(0, 200),
+      amount: Math.abs(Number(tx.amount) || 0),
       type: tx.type === 'income' ? 'income' : 'expense',
-      category: (tx.category || 'Geral').slice(0, 80),
-      date: (tx.date || new Date().toISOString().slice(0, 10)).slice(0, 40),
+      category: String(tx.category || 'Geral').slice(0, 80),
+      date: String(tx.date || now.slice(0, 10)).slice(0, 40),
       status: tx.status === 'pending' ? 'pending' : 'paid',
-      updatedAt: new Date().toISOString(),
+      updatedAt: now,
     };
     if (tx.paymentMethod) data.paymentMethod = String(tx.paymentMethod).slice(0, 30);
-    if (tx.scope) data.scope = tx.scope;
+    if (tx.scope) data.scope = String(tx.scope).slice(0, 30);
     if (tx.notes) data.notes = String(tx.notes).slice(0, 500);
     if (tx.installmentInfo) data.installmentInfo = tx.installmentInfo;
-    batch.set(ref, data, { merge: true });
-    count++;
+    writes.push({ sub: 'transactions', id: tx.id, data });
   }
 
-  for (const debt of localDebts) {
+  for (const debt of localDebts || []) {
     if (!debt || !debt.id) continue;
-    const ref = doc(db, 'users', userId, 'debts', debt.id);
+    if (debtIds.has(debt.id)) { skipped++; continue; }
     const data: Record<string, any> = {
       id: debt.id,
       userId,
-      title: (debt.title || 'Dívida').slice(0, 200),
-      totalAmount: Number(debt.totalAmount) || 0,
-      paidAmount: Number(debt.paidAmount) || 0,
-      status: debt.status || 'active',
-      createdAt: debt.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      title: String(debt.title || 'Dívida').slice(0, 200),
+      totalAmount: Math.max(0, Number(debt.totalAmount) || 0),
+      paidAmount: Math.max(0, Number(debt.paidAmount) || 0),
+      status: debt.status === 'paid' ? 'paid' : 'active',
+      createdAt: String(debt.createdAt || now).slice(0, 40),
+      updatedAt: now,
     };
     if (debt.creditor) data.creditor = String(debt.creditor).slice(0, 100);
     if (debt.dueDate) data.dueDate = String(debt.dueDate).slice(0, 40);
     if (debt.notes) data.notes = String(debt.notes).slice(0, 500);
-    if (debt.paymentHistory) data.paymentHistory = debt.paymentHistory;
-    batch.set(ref, data, { merge: true });
-    count++;
+    if (Array.isArray(debt.paymentHistory)) data.paymentHistory = debt.paymentHistory;
+    writes.push({ sub: 'debts', id: debt.id, data });
   }
 
-  for (const inv of localInvestments) {
+  for (const inv of localInvestments || []) {
     if (!inv || !inv.id) continue;
-    const ref = doc(db, 'users', userId, 'investments', inv.id);
+    if (invIds.has(inv.id)) { skipped++; continue; }
     const data: Record<string, any> = {
       id: inv.id,
       userId,
-      title: (inv.title || 'Investimento').slice(0, 200),
-      category: inv.category || 'Outros',
-      institution: (inv.institution || 'Geral').slice(0, 100),
-      investedAmount: Number(inv.investedAmount) || 0,
-      currentValue: Number(inv.currentValue) || 0,
-      createdAt: inv.createdAt || new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      title: String(inv.title || 'Investimento').slice(0, 200),
+      category: String(inv.category || 'other').slice(0, 40),
+      institution: String(inv.institution || 'Geral').slice(0, 100),
+      investedAmount: Math.max(0, Number(inv.investedAmount) || 0),
+      currentValue: Math.max(0, Number(inv.currentValue) || 0),
+      createdAt: String(inv.createdAt || now).slice(0, 40),
+      updatedAt: now,
     };
-    if (inv.targetAmount !== undefined) data.targetAmount = Number(inv.targetAmount);
+    if (inv.targetAmount !== undefined && inv.targetAmount !== null) {
+      data.targetAmount = Math.max(0, Number(inv.targetAmount) || 0);
+    }
     if (inv.yieldRate) data.yieldRate = String(inv.yieldRate).slice(0, 50);
     if (inv.notes) data.notes = String(inv.notes).slice(0, 500);
-    if (inv.history) data.history = inv.history;
-    batch.set(ref, data, { merge: true });
-    count++;
+    if (Array.isArray(inv.history)) data.history = inv.history;
+    writes.push({ sub: 'investments', id: inv.id, data });
   }
 
-  if (count > 0) {
+  for (let i = 0; i < writes.length; i += BATCH_LIMIT) {
+    const batch = writeBatch(db);
+    for (const w of writes.slice(i, i + BATCH_LIMIT)) {
+      batch.set(doc(db, 'users', userId, w.sub, w.id), w.data);
+    }
     try {
       await batch.commit();
     } catch (error) {
@@ -434,5 +460,5 @@ export async function syncLocalDataToFirestore(
     }
   }
 
-  return { count };
+  return { count: writes.length, skipped };
 }

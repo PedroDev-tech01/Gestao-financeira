@@ -20,6 +20,9 @@ import { MonthPickerModal } from './components/MonthPickerModal';
 import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
 import { NotificationCenterModal } from './components/NotificationCenterModal';
 import { DueAlertsBanner } from './components/DueAlertsBanner';
+import { CloudMigrationModal } from './components/CloudMigrationModal';
+import { migrateLocalAccountToCloud } from './services/migrationService';
+import { getPendingMigration, isLocalOnlySession, isDemoSession } from './utils/legacyAccounts';
 import {
   getDueReminders,
   checkAndSendDailyNotification,
@@ -44,7 +47,6 @@ import {
   subscribeToInvestments,
   saveInvestment as fsSaveInvestment,
   deleteInvestment as fsDeleteInvestment,
-  syncLocalDataToFirestore,
   saveUserProfile
 } from './services/firestoreService';
 import {
@@ -77,7 +79,8 @@ import {
   TrendingUp,
   Search,
   X,
-  Cloud
+  Cloud,
+  CloudUpload
 } from 'lucide-react';
 
 export default function App() {
@@ -238,7 +241,7 @@ export default function App() {
       if (fbUser) {
         setFirebaseUid(fbUser.uid);
         const cloudUser: AuthSessionUser = {
-          name: fbUser.displayName || 'Usuário Google',
+          name: fbUser.displayName || fbUser.email?.split('@')[0] || 'Minhas Finanças',
           cpf: fbUser.email || fbUser.uid,
           uid: fbUser.uid,
           email: fbUser.email || undefined,
@@ -273,6 +276,23 @@ export default function App() {
     });
     return () => unsubscribe();
   }, []);
+
+  // Retoma uma migração para a nuvem que foi interrompida (ex.: página fechada no meio do envio).
+  // Os dados locais nunca são apagados, então é seguro tentar de novo.
+  useEffect(() => {
+    if (!firebaseUid) return;
+    const pending = getPendingMigration();
+    if (!pending || pending.uid !== firebaseUid) return;
+    migrateLocalAccountToCloud(
+      { name: pending.name, cpf: pending.cpf },
+      firebaseUid,
+      auth.currentUser?.email
+    )
+      .then(({ count }) => {
+        if (count > 0) addToast('success', `${count} itens do aparelho foram enviados para a nuvem.`);
+      })
+      .catch((e) => console.warn('Pending migration retry notice:', e));
+  }, [firebaseUid]);
 
   // Real-time Firestore sync when authenticated with Firebase
   useEffect(() => {
@@ -421,31 +441,34 @@ export default function App() {
     addToast('info', 'Você saiu da sua conta.');
   };
 
-  const handleConnectCloud = async () => {
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      const user = result.user;
-      const cloudUser: AuthSessionUser = {
-        name: user.displayName || 'Usuário Google',
-        cpf: user.email || 'Conta Google',
-        uid: user.uid,
-        email: user.email || undefined,
-        photoURL: user.photoURL || undefined,
-        isCloudSynced: true,
-      };
-      setCurrentUser(cloudUser);
-      setFirebaseUid(user.uid);
-      localStorage.setItem('aquigastos_active_session', JSON.stringify(cloudUser));
-      addToast('success', 'Conta Google conectada ao Firebase Firestore!');
-    } catch (err: any) {
-      console.error('Connect cloud error:', err);
-      if (err?.code !== 'auth/popup-closed-by-user') {
-        addToast('error', 'Falha ao conectar com o Google no momento.');
-      }
+  // Conta salva só no aparelho -> abre o fluxo que cria a conta na nuvem e leva os dados junto.
+  const [isMigrationOpen, setIsMigrationOpen] = useState(false);
+  const handleConnectCloud = () => {
+    if (isLocalOnlySession(currentUser)) {
+      setIsMigrationOpen(true);
+    }
+  };
+
+  const handleMigrationDone = ({ count, skipped }: { count: number; skipped: number }) => {
+    setIsMigrationOpen(false);
+    if (count === 0 && skipped === 0) {
+      addToast('success', 'Conta na nuvem pronta! Seus próximos lançamentos já serão salvos nela.');
+    } else if (skipped > 0) {
+      addToast('success', `Pronto! ${count} itens enviados para a nuvem (${skipped} já estavam lá).`);
+    } else {
+      addToast('success', `Pronto! ${count} itens enviados para a nuvem. Agora você acessa de qualquer aparelho.`);
     }
   };
 
   const handleSwitchAccount = async () => {
+    const isGoogleAccount = Boolean(
+      auth.currentUser?.providerData?.some((p) => p.providerId === 'google.com')
+    );
+    if (!isGoogleAccount) {
+      // Contas de e-mail: volta para a tela de login para escolher outra conta.
+      await handleLogout();
+      return;
+    }
     try {
       await fbSignOut(auth);
     } catch (e) {
@@ -878,8 +901,39 @@ export default function App() {
         onOpenNotifications={() => setIsNotificationCenterOpen(true)}
       />
 
+      {/* Fluxo para levar dados salvos só no aparelho para a nuvem */}
+      {isMigrationOpen && (
+        <CloudMigrationModal
+          isOpen={isMigrationOpen}
+          localUser={currentUser}
+          itemCount={transactions.length + debts.length + investments.length}
+          onClose={() => setIsMigrationOpen(false)}
+          onMigrated={handleMigrationDone}
+        />
+      )}
+
       {/* Main Content Area */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 sm:pt-5 pb-12">
+
+        {isLocalOnlySession(currentUser) && (
+          <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-3 justify-between bg-gradient-to-r from-amber-950/40 via-[#131A29] to-[#0E131F] border border-amber-700/40 rounded-2xl px-4 py-3">
+            <div className="text-xs text-amber-100 leading-relaxed">
+              <strong className="text-amber-300">
+                {isDemoSession(currentUser) ? 'Você está no modo sem conta.' : 'Seus dados estão salvos só neste aparelho.'}
+              </strong>{' '}
+              Se limpar o navegador ou trocar de celular, eles somem. Crie sua conta para guardar tudo na nuvem.
+            </div>
+            <button
+              id="btn-open-cloud-migration"
+              type="button"
+              onClick={() => setIsMigrationOpen(true)}
+              className="shrink-0 flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl cursor-pointer active:scale-[0.98]"
+            >
+              <CloudUpload size={14} />
+              Salvar na nuvem
+            </button>
+          </div>
+        )}
         
         {/* Quick Guide Banner - Self-explanatory Onboarding */}
         <QuickGuideBanner

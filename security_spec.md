@@ -3,9 +3,9 @@
 ## 1. Data Invariants
 1. **User Isolation**: A user can only read, write, update, and delete documents within their own subtree `/users/{userId}/**` where `request.auth.uid == userId`.
 2. **Identity Integrity**: `userId` field inside document data must strictly match `request.auth.uid`. No user can create or update a transaction, debt, or investment assigned to another user UID.
-3. **Valid ID Checks**: All document IDs must adhere to `isValidId()` pattern (`^[a-zA-Z0-9_-]+$`) and maximum length of 128 characters.
+3. **Valid ID Checks**: Document IDs have a maximum length of 128 characters and the `id` field must match the document ID.
 4. **Boundary & Schema Constraints**:
-   - Transaction: `amount` must be a positive number; `description` <= 200 chars; `type` must be `'income' | 'expense'`.
+   - Transaction: `amount` must be a number >= 0; `description` <= 200 chars; `type` must be `'income' | 'expense'`.
    - Debt: `totalAmount` >= 0; `paidAmount` >= 0; `title` <= 200 chars; `status` in `['active', 'negotiating', 'paid']`.
    - Investment: `investedAmount` >= 0; `currentValue` >= 0; `title` <= 200 chars; `institution` <= 100 chars.
 5. **No Cross-User Access**: Unauthenticated requests or cross-user requests are unconditionally rejected (PERMISSION_DENIED).
@@ -23,3 +23,13 @@
 10. **Payload 10 (Debt Overpayment Corruption)**: Debt with negative `totalAmount: -1000`.
 11. **Payload 11 (Invalid Debt Status)**: Debt with `status: "erased_by_hacker"`.
 12. **Payload 12 (Root Document Write Hijack)**: Direct write to root catch-all collection `/system_secrets/config`.
+
+## 3. Compatibilidade com dados existentes
+As validações só se aplicam aos campos que estão sendo criados ou alterados na escrita
+(`request.resource.data.diff(resource.data).affectedKeys()`). Documentos gravados por versões
+antigas do app continuam podendo ser lidos, editados e apagados pelo dono, mesmo que tenham
+campos que hoje não são mais aceitos.
+
+## 4. Como testar
+`npm run test:rules` sobe o emulador do Firestore e roda `tests/firestore-rules.test.mjs`
+(cobre os cenários acima). Precisa de Java instalado.

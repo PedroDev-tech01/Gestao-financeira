@@ -507,7 +507,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                       id="btn-switch-account-header"
                       onClick={onSwitchAccount}
                       className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-[#0A0D14] hover:bg-slate-800 border border-slate-800/80 rounded-xl transition-all cursor-pointer active:scale-95 min-h-[38px]"
-                      title="Trocar para outra Conta Google"
+                      title="Trocar de conta"
                     >
                       <UserCheck size={13} className="text-emerald-400" />
                       <span>Trocar Conta</span>
@@ -529,10 +529,10 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                       id="btn-connect-cloud-header"
                       onClick={onConnectCloud}
                       className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 hover:text-white bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/40 rounded-xl transition-all cursor-pointer active:scale-[0.98] min-h-[38px]"
-                      title="Vincular Conta Google para sincronizar com outros dispositivos"
+                      title="Criar conta na nuvem e levar seus dados junto"
                     >
                       <Cloud size={13} className="text-emerald-400" />
-                      <span>Vincular Nuvem</span>
+                      <span>Salvar na Nuvem</span>
                     </button>
                   )}
                 </div>
