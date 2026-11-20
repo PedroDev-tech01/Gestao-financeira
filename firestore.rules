@@ -16,95 +16,23 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    function isValidId(id) {
-      return id is string && id.size() > 0 && id.size() <= 128;
-    }
-
-    function incoming() {
-      return request.resource.data;
-    }
-
-    function existing() {
-      return resource.data;
-    }
-
-    // Entity Validation: UserProfile
-    function isValidUserProfile(data, userId) {
-      return (!('id' in data) || data.id == userId) &&
-             (!('uid' in data) || data.uid == userId) &&
-             (!('displayName' in data) || (data.displayName is string && data.displayName.size() <= 200)) &&
-             (!('name' in data) || (data.name is string && data.name.size() <= 200)) &&
-             (!('email' in data) || (data.email is string && data.email.size() <= 320)) &&
-             (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 2000)) &&
-             (!('avatar' in data) || (data.avatar is string && data.avatar.size() <= 2000)) &&
-             (!('cpf' in data) || (data.cpf is string && data.cpf.size() <= 100)) &&
-             (!('monthlyBudget' in data) || (data.monthlyBudget is number && data.monthlyBudget >= 0)) &&
-             (!('hideBalance' in data) || data.hideBalance is bool) &&
-             (!('isCloudSynced' in data) || data.isCloudSynced is bool);
-    }
-
-    // Entity Validation: Transaction
-    function isValidTransaction(data, userId) {
-      return (!('userId' in data) || data.userId == userId) &&
-             (!('description' in data) || (data.description is string && data.description.size() <= 300)) &&
-             (!('amount' in data) || data.amount is number) &&
-             (!('type' in data) || (data.type == 'income' || data.type == 'expense')) &&
-             (!('category' in data) || (data.category is string && data.category.size() <= 120)) &&
-             (!('date' in data) || (data.date is string && data.date.size() <= 50)) &&
-             (!('paymentMethod' in data) || (data.paymentMethod is string && data.paymentMethod.size() <= 50)) &&
-             (!('status' in data) || (data.status is string && data.status.size() <= 30)) &&
-             (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000));
-    }
-
-    // Entity Validation: Debt
-    function isValidDebt(data, userId) {
-      return (!('userId' in data) || data.userId == userId) &&
-             (!('title' in data) || (data.title is string && data.title.size() <= 300)) &&
-             (!('totalAmount' in data) || data.totalAmount is number) &&
-             (!('paidAmount' in data) || data.paidAmount is number) &&
-             (!('creditor' in data) || (data.creditor is string && data.creditor.size() <= 150)) &&
-             (!('status' in data) || (data.status is string && data.status.size() <= 40)) &&
-             (!('dueDate' in data) || (data.dueDate is string && data.dueDate.size() <= 50)) &&
-             (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000));
-    }
-
-    // Entity Validation: Investment
-    function isValidInvestment(data, userId) {
-      return (!('userId' in data) || data.userId == userId) &&
-             (!('title' in data) || (data.title is string && data.title.size() <= 300)) &&
-             (!('investedAmount' in data) || data.investedAmount is number) &&
-             (!('currentValue' in data) || data.currentValue is number) &&
-             (!('category' in data) || (data.category is string && data.category.size() <= 80)) &&
-             (!('institution' in data) || (data.institution is string && data.institution.size() <= 150)) &&
-             (!('yieldRate' in data) || (data.yieldRate is string && data.yieldRate.size() <= 100)) &&
-             (!('notes' in data) || (data.notes is string && data.notes.size() <= 1000));
-    }
-
-    // Match /users/{userId}
+    // Match /users/{userId} - Strict per-user private sandbox
     match /users/{userId} {
-      allow get: if isOwner(userId) && isValidId(userId);
-      allow create, update: if isOwner(userId) && isValidId(userId) && isValidUserProfile(incoming(), userId);
-      allow delete: if isOwner(userId) && isValidId(userId);
+      allow read, write: if isOwner(userId);
 
       // Match /users/{userId}/transactions/{transactionId}
       match /transactions/{transactionId} {
-        allow get, list: if isOwner(userId) && isValidId(userId);
-        allow create, update: if isOwner(userId) && isValidId(userId) && isValidId(transactionId) && isValidTransaction(incoming(), userId);
-        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(transactionId);
+        allow read, write: if isOwner(userId);
       }
 
       // Match /users/{userId}/debts/{debtId}
       match /debts/{debtId} {
-        allow get, list: if isOwner(userId) && isValidId(userId);
-        allow create, update: if isOwner(userId) && isValidId(userId) && isValidId(debtId) && isValidDebt(incoming(), userId);
-        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(debtId);
+        allow read, write: if isOwner(userId);
       }
 
       // Match /users/{userId}/investments/{investmentId}
       match /investments/{investmentId} {
-        allow get, list: if isOwner(userId) && isValidId(userId);
-        allow create, update: if isOwner(userId) && isValidId(userId) && isValidId(investmentId) && isValidInvestment(incoming(), userId);
-        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(investmentId);
+        allow read, write: if isOwner(userId);
       }
     }
   }

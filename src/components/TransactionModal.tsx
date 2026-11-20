@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   X,
-  PlusCircle,
-  MinusCircle,
   Check,
-  CheckCircle2,
-  Clock,
+  Utensils,
+  Home,
+  Car,
+  HeartPulse,
+  Building2,
+  Plane,
+  ShoppingBag,
+  Laptop,
+  GraduationCap,
+  PawPrint,
+  TrendingUp,
+  DollarSign,
+  Briefcase,
   Layers,
-  Info,
-  Calendar,
-  CreditCard
 } from 'lucide-react';
-import { Transaction, CategoryItem, TransactionType, PaymentMethod } from '../types';
-import { addMonthsToDate, formatCurrency } from '../utils/formatters';
+import { Transaction, CategoryItem, TransactionType } from '../types';
 
 interface TransactionModalProps {
   isOpen: boolean;
@@ -23,6 +28,44 @@ interface TransactionModalProps {
   categories: CategoryItem[];
 }
 
+const SHORT_CATEGORY_LABELS: Record<string, string> = {
+  'Alimentação & Mercado': 'Alimentação',
+  'Moradia, Aluguel & Contas': 'Moradia & Contas',
+  'Transporte & Combustível': 'Transporte',
+  'Saúde, Consultas & Farmácia': 'Saúde & Farmácia',
+  'Dívidas & Quitações': 'Dívidas',
+  'Lazer & Restaurantes': 'Lazer',
+  'Compras & Vestuário': 'Compras',
+  'Assinaturas & Streaming': 'Assinaturas',
+  'Educação & Livros': 'Educação',
+  'Pets & Veterinário': 'Pets',
+  'Investimentos & Reserva de Emergência': 'Investimentos',
+  'Salário / Renda Principal': 'Salário',
+  'Renda Extra & Bicos': 'Renda Extra',
+  'Rendimentos & Dividendos': 'Rendimentos',
+  'Vendas de Produtos / Desapego': 'Vendas',
+  'Outros Lançamentos': 'Outros',
+};
+
+const getCategoryIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'Utensils': return Utensils;
+    case 'Home': return Home;
+    case 'Car': return Car;
+    case 'HeartPulse': return HeartPulse;
+    case 'Building2': return Building2;
+    case 'Plane': return Plane;
+    case 'ShoppingBag': return ShoppingBag;
+    case 'Laptop': return Laptop;
+    case 'GraduationCap': return GraduationCap;
+    case 'PawPrint': return PawPrint;
+    case 'TrendingUp': return TrendingUp;
+    case 'DollarSign': return DollarSign;
+    case 'Briefcase': return Briefcase;
+    default: return Layers;
+  }
+};
+
 export const TransactionModal: React.FC<TransactionModalProps> = ({
   isOpen,
   onClose,
@@ -31,606 +74,305 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
   defaultType = 'expense',
   categories,
 }) => {
+  const todayStr = new Date().toISOString().split('T')[0];
+
   const [type, setType] = useState<TransactionType>(defaultType);
-  const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('credit_card');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-  const [status, setStatus] = useState<Transaction['status']>('paid');
-  const [notes, setNotes] = useState('');
+  const [description, setDescription] = useState('');
+  const [date, setDate] = useState(todayStr);
+  const [justSaved, setJustSaved] = useState(false);
 
-  // Installment states (only for new expenses)
-  const [isInstallment, setIsInstallment] = useState(false);
-  const [installmentsCount, setInstallmentsCount] = useState(2);
-  const [installmentMode, setInstallmentMode] = useState<'total_divided' | 'installment_value'>('total_divided');
+  const amountInputRef = useRef<HTMLInputElement>(null);
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  const yesterdayStr = (() => {
-    const d = new Date();
-    d.setDate(d.getDate() - 1);
-    return d.toISOString().split('T')[0];
-  })();
+  const getFilteredCategories = (targetType: TransactionType) => {
+    const filtered = categories.filter(c => c.type === targetType || c.type === 'both');
+    if (filtered.length > 0) return filtered;
+    return targetType === 'income'
+      ? [
+          { id: 'cat-salario', name: 'Salário / Renda Principal', icon: 'DollarSign', color: '#10B981', bgLight: '#ECFDF5', type: 'income' as const },
+          { id: 'cat-renda-extra', name: 'Renda Extra & Bicos', icon: 'Briefcase', color: '#059669', bgLight: '#D1FAE5', type: 'income' as const },
+          { id: 'cat-rendimentos', name: 'Rendimentos & Dividendos', icon: 'TrendingUp', color: '#14B8A6', bgLight: '#F0FDFA', type: 'income' as const },
+          { id: 'cat-vendas', name: 'Vendas de Produtos / Desapego', icon: 'ShoppingBag', color: '#0D9488', bgLight: '#CCFBF1', type: 'income' as const },
+          { id: 'cat-outros', name: 'Outros Lançamentos', icon: 'Layers', color: '#64748B', bgLight: '#F1F5F9', type: 'both' as const },
+        ]
+      : [
+          { id: 'cat-alimentacao', name: 'Alimentação & Mercado', icon: 'Utensils', color: '#EC4899', bgLight: '#FDF2F8', type: 'expense' as const },
+          { id: 'cat-moradia', name: 'Moradia, Aluguel & Contas', icon: 'Home', color: '#F59E0B', bgLight: '#FEF3C7', type: 'expense' as const },
+          { id: 'cat-transporte', name: 'Transporte & Combustível', icon: 'Car', color: '#8B5CF6', bgLight: '#F5F3FF', type: 'expense' as const },
+          { id: 'cat-lazer', name: 'Lazer & Restaurantes', icon: 'Plane', color: '#6366F1', bgLight: '#EEF2FF', type: 'expense' as const },
+          { id: 'cat-compras', name: 'Compras & Vestuário', icon: 'ShoppingBag', color: '#EC4899', bgLight: '#FDF2F8', type: 'expense' as const },
+          { id: 'cat-saude', name: 'Saúde, Consultas & Farmácia', icon: 'HeartPulse', color: '#06B6D4', bgLight: '#ECFEFF', type: 'expense' as const },
+          { id: 'cat-outros', name: 'Outros Lançamentos', icon: 'Layers', color: '#64748B', bgLight: '#F1F5F9', type: 'both' as const },
+        ];
+  };
 
   useEffect(() => {
+    if (!isOpen) return;
+
     if (editingTransaction) {
       setType(editingTransaction.type);
-      setDescription(editingTransaction.description);
       setAmount(editingTransaction.amount.toString());
       setCategory(editingTransaction.category);
-      setPaymentMethod(editingTransaction.paymentMethod || 'pix');
+      setDescription(editingTransaction.description);
       setDate(editingTransaction.date);
-      setStatus(editingTransaction.status);
-      setNotes(editingTransaction.notes || '');
-      setIsInstallment(false);
     } else {
+      const initialList = getFilteredCategories(defaultType);
       setType(defaultType);
-      setDescription('');
       setAmount('');
-      const defaultCat = defaultType === 'income' ? 'Salário / Renda Principal' : 'Alimentação';
-      setCategory(defaultCat);
-      setPaymentMethod(defaultType === 'income' ? 'pix' : 'credit_card');
+      setCategory(initialList[0]?.name || (defaultType === 'income' ? 'Salário / Renda Principal' : 'Alimentação & Mercado'));
+      setDescription('');
       setDate(todayStr);
-      setStatus('paid');
-      setNotes('');
-      setIsInstallment(false);
-      setInstallmentsCount(2);
-      setInstallmentMode('total_divided');
     }
+    setJustSaved(false);
+
+    const timer = setTimeout(() => {
+      amountInputRef.current?.focus();
+    }, 30);
+    return () => clearTimeout(timer);
   }, [editingTransaction, defaultType, isOpen, todayStr]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
-  // Amount parsing & calculations for installments
+  const availableCategories = getFilteredCategories(type);
   const numericAmount = parseFloat(amount.replace(',', '.')) || 0;
-  
-  let singleInstallmentAmount = 0;
-  let totalInstallmentsAmount = 0;
 
-  if (isInstallment && installmentsCount > 1 && numericAmount > 0) {
-    if (installmentMode === 'total_divided') {
-      singleInstallmentAmount = Number((numericAmount / installmentsCount).toFixed(2));
-      totalInstallmentsAmount = numericAmount;
-    } else {
-      singleInstallmentAmount = numericAmount;
-      totalInstallmentsAmount = Number((numericAmount * installmentsCount).toFixed(2));
+  const handleTypeChange = (newType: TransactionType) => {
+    setType(newType);
+    const list = getFilteredCategories(newType);
+    if (!list.some(c => c.name === category)) {
+      setCategory(list[0]?.name || '');
     }
-  }
+    amountInputRef.current?.focus();
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (numericAmount <= 0) return;
-    if (!description.trim()) return;
+    if (numericAmount <= 0) {
+      amountInputRef.current?.focus();
+      return;
+    }
 
-    // If editing existing transaction
+    const selectedCategory = category || availableCategories[0]?.name || (type === 'income' ? 'Salário / Renda Principal' : 'Alimentação & Mercado');
+    const finalDescription = description.trim() || SHORT_CATEGORY_LABELS[selectedCategory] || selectedCategory;
+
     if (editingTransaction) {
       const updated: Transaction = {
-        id: editingTransaction.id,
-        description: description.trim(),
+        ...editingTransaction,
+        description: finalDescription,
         amount: numericAmount,
         type,
-        category: category || (type === 'income' ? 'Outras Receitas' : 'Outros Gastos'),
-        date,
-        status,
-        scope: 'personal',
-        paymentMethod,
-        notes: notes.trim() || undefined,
-        installmentInfo: editingTransaction.installmentInfo,
+        category: selectedCategory,
+        date: date || todayStr,
       };
       onSave(updated);
       onClose();
       return;
     }
 
-    // If creating a new installment purchase
-    if (type === 'expense' && isInstallment && paymentMethod === 'credit_card' && installmentsCount > 1) {
-      const parentId = `inst-group-${Date.now()}`;
-      const generatedTransactions: Omit<Transaction, 'id'>[] = [];
-
-      for (let i = 0; i < installmentsCount; i++) {
-        const installmentDate = addMonthsToDate(date, i);
-        const installmentIndex = i + 1;
-        
-        // The first installment can be paid or pending as selected;
-        // Future installments are automatically set as pending (a pagar)
-        const itemStatus: Transaction['status'] = i === 0 ? status : 'pending';
-
-        generatedTransactions.push({
-          description: `${description.trim()} (${installmentIndex}/${installmentsCount})`,
-          amount: singleInstallmentAmount,
-          type: 'expense',
-          category: category || 'Outros Gastos',
-          date: installmentDate,
-          status: itemStatus,
-          scope: 'personal',
-          paymentMethod: 'credit_card',
-          notes: notes.trim() 
-            ? `${notes.trim()} • Parcela ${installmentIndex} de ${installmentsCount} (Total: ${formatCurrency(totalInstallmentsAmount)})`
-            : `Parcela ${installmentIndex} de ${installmentsCount} • Total da compra: ${formatCurrency(totalInstallmentsAmount)}`,
-          installmentInfo: {
-            current: installmentIndex,
-            total: installmentsCount,
-            parentId,
-          }
-        });
-      }
-
-      onSave(generatedTransactions);
-      onClose();
-      return;
-    }
-
-    // Standard single transaction
-    const data: Omit<Transaction, 'id'> = {
-      description: description.trim(),
+    const newTransaction: Omit<Transaction, 'id'> = {
+      description: finalDescription,
       amount: numericAmount,
       type,
-      category: category || (type === 'income' ? 'Outras Receitas' : 'Outros Gastos'),
-      date,
-      status,
+      category: selectedCategory,
+      date: date || todayStr,
+      status: 'paid',
       scope: 'personal',
-      paymentMethod,
-      notes: notes.trim() || undefined,
+      paymentMethod: 'pix',
     };
 
-    onSave(data);
-    onClose();
+    onSave(newTransaction);
+
+    // Clear fields and prepare immediately for the next entry
+    setAmount('');
+    setDescription('');
+    setJustSaved(true);
+    setTimeout(() => setJustSaved(false), 2000);
+    setTimeout(() => {
+      amountInputRef.current?.focus();
+    }, 10);
   };
 
-  const filteredCategories = categories.filter(c => {
-    if (type === 'income') return c.type === 'income' || c.type === 'both';
-    if (type === 'expense') return c.type === 'expense' || c.type === 'both';
-    return true;
-  });
-
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-gradient-to-b from-[#141B29] to-[#0E131F] rounded-t-3xl sm:rounded-3xl max-w-lg w-full shadow-2xl border-t sm:border border-slate-800/90 overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[92vh]">
-        
-        {/* Mobile pull indicator */}
-        <div className="w-10 h-1 bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
-
-        {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-800/80 bg-[#0A0D14]/80">
-          <div>
-            <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-              {editingTransaction ? 'Editar Lançamento' : (type === 'expense' ? 'Adicionar Gasto / Despesa' : 'Adicionar Entrada / Receita')}
-            </h3>
-            <p className="text-xs text-slate-400 mt-0.5">
-              {type === 'expense' 
-                ? 'Preencha os dados da despesa (com opção de parcelar nos próximos meses)' 
-                : 'Preencha o valor e a origem da receita'}
-            </p>
-          </div>
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/75 p-0 sm:p-4 overflow-y-auto"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="bg-[#131A29] border-t sm:border border-slate-800 rounded-t-2xl sm:rounded-2xl w-full max-w-md shadow-2xl overflow-hidden my-auto">
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/80">
+          <h2 className="text-base font-bold text-white">
+            {editingTransaction ? 'Editar Lançamento' : 'Novo Lançamento'}
+          </h2>
           <button
-            id="close-transaction-modal"
+            type="button"
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-full transition-colors cursor-pointer active:scale-95"
-            title="Fechar janela"
+            className="min-h-[44px] min-w-[44px] -mr-2 flex items-center justify-center text-slate-400 hover:text-white rounded-xl"
+            aria-label="Fechar"
           >
-            <X size={18} />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-5 sm:p-6 pb-[max(env(safe-area-inset-bottom,0px),1.5rem)] overflow-y-auto space-y-4">
-          
-          {/* Type Segment Control (Despesa vs Receita) */}
-          <div className="grid grid-cols-2 p-1 bg-[#0A0D14] rounded-2xl gap-1.5 border border-slate-800/80">
+        <form onSubmit={handleSubmit} className="p-4 space-y-4">
+          {/* 1. Tipo: Gasto ou Ganho */}
+          <div className="grid grid-cols-2 gap-2.5">
             <button
               type="button"
-              id="modal-tab-expense"
-              onClick={() => {
-                setType('expense');
-                if (category.includes('Salário') || category.includes('Rendimento')) {
-                  setCategory('Alimentação');
-                }
-              }}
-              className={`py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] ${
+              onClick={() => handleTypeChange('expense')}
+              className={`min-h-[48px] rounded-xl font-bold text-sm transition-colors flex items-center justify-center ${
                 type === 'expense'
-                  ? 'bg-rose-950/60 text-rose-300 shadow-xs border border-rose-800/60'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-red-600 text-white shadow-sm'
+                  : 'bg-[#0A0D14] text-slate-400 border border-slate-800 hover:text-white'
               }`}
             >
-              <MinusCircle size={17} />
-              <span>Gasto / Despesa</span>
+              Gasto
             </button>
-
             <button
               type="button"
-              id="modal-tab-income"
-              onClick={() => {
-                setType('income');
-                setIsInstallment(false);
-                setCategory('Salário / Renda Principal');
-              }}
-              className={`py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] ${
+              onClick={() => handleTypeChange('income')}
+              className={`min-h-[48px] rounded-xl font-bold text-sm transition-colors flex items-center justify-center ${
                 type === 'income'
-                  ? 'bg-emerald-950/60 text-emerald-300 shadow-xs border border-emerald-800/60'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-emerald-600 text-white shadow-sm'
+                  : 'bg-[#0A0D14] text-slate-400 border border-slate-800 hover:text-white'
               }`}
             >
-              <PlusCircle size={17} />
-              <span>Ganho / Receita</span>
+              Ganho
             </button>
           </div>
 
-          {/* Amount Field with Quick Presets */}
+          {/* 2. Valor (Campo Principal) */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                Valor em Reais (R$)
-              </label>
-              <div className="flex items-center gap-1.5">
-                {[50, 100, 200, 500].map(val => (
-                  <button
-                    key={val}
-                    type="button"
-                    onClick={() => {
-                      const cur = parseFloat(amount.replace(',', '.')) || 0;
-                      setAmount((cur + val).toFixed(2));
-                    }}
-                    className="px-2 py-0.5 text-[11px] font-bold bg-[#0A0D14] hover:bg-slate-800 text-slate-400 hover:text-white border border-slate-800 rounded-lg cursor-pointer transition-all active:scale-95"
-                  >
-                    +{val}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="relative">
-              <span className={`absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black ${
-                type === 'income' ? 'text-emerald-400' : 'text-rose-400'
-              }`}>
+            <label htmlFor="tx-amount-input" className="block text-xs font-semibold text-slate-400 mb-1.5">
+              Valor
+            </label>
+            <div
+              className={`flex items-center bg-[#0A0D14] border-2 rounded-xl px-4 py-3 transition-colors ${
+                type === 'expense'
+                  ? 'border-slate-800 focus-within:border-red-500'
+                  : 'border-slate-800 focus-within:border-emerald-500'
+              }`}
+            >
+              <span
+                className={`text-xl font-bold mr-2 select-none ${
+                  type === 'expense' ? 'text-red-400' : 'text-emerald-400'
+                }`}
+              >
                 R$
               </span>
               <input
-                id="modal-input-amount"
-                type="number"
-                step="0.01"
+                ref={amountInputRef}
+                id="tx-amount-input"
+                type="text"
                 inputMode="decimal"
+                autoFocus
                 required
                 placeholder="0,00"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className={`w-full pl-14 pr-4 py-3.5 text-2xl font-black bg-[#0A0D14] border rounded-2xl focus:outline-none transition-all placeholder:text-slate-600 ${
-                  type === 'income'
-                    ? 'text-emerald-300 border-slate-800 focus:border-emerald-500/60'
-                    : 'text-rose-300 border-slate-800 focus:border-rose-500/60'
-                }`}
-                autoFocus
+                onChange={(e) => setAmount(e.target.value.replace(/[^0-9.,]/g, ''))}
+                className="w-full bg-transparent text-2xl sm:text-3xl font-extrabold text-white placeholder-slate-700 focus:outline-none tabular-nums"
               />
             </div>
           </div>
 
-          {/* Description */}
+          {/* 3. Categoria (Grade de Botões Pré-definidos) */}
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
-              O que é? (Descrição)
+            <label className="block text-xs font-semibold text-slate-400 mb-1.5">
+              Categoria
             </label>
-            <input
-              id="modal-input-desc"
-              type="text"
-              required
-              placeholder={type === 'income' ? 'Ex: Salário do mês, Bico, Venda de item' : 'Ex: Compra no mercado, Farmácia, Tênis novo'}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-[#0A0D14] border border-slate-800 rounded-xl text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50 transition-all"
-            />
-          </div>
-
-          {/* Category with Didactic Guidance */}
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                Categoria
-              </label>
-              {type === 'expense' && (
-                <span className="text-[10px] text-slate-500">
-                  Ajuda a classificar na regra 50-30-20
-                </span>
-              )}
-            </div>
-            <select
-              id="modal-select-category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-[#0A0D14] border border-slate-800 rounded-xl font-medium text-slate-100 focus:outline-none focus:border-emerald-500/50 cursor-pointer"
-            >
-              {filteredCategories.map(cat => {
-                const groupPrefix = cat.categoryGroup === 'essential' 
-                  ? '📌 Essencial • ' 
-                  : (cat.categoryGroup === 'investment' 
-                      ? '💎 Reserva/Invest • ' 
-                      : (cat.categoryGroup === 'revenue' ? '💰 Ganho • ' : '✨ Estilo de Vida • '));
-                return (
-                  <option key={cat.id} value={cat.name}>
-                    {groupPrefix}{cat.name}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-
-          {/* Payment Method Pills */}
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                Como foi pago?
-              </label>
-              {paymentMethod === 'credit_card' && type === 'expense' && !editingTransaction && (
-                <span className="text-[10px] text-purple-300 flex items-center gap-1 font-medium">
-                  <CreditCard size={11} />
-                  <span>Permite parcelar abaixo</span>
-                </span>
-              )}
-            </div>
-            <div className="grid grid-cols-4 gap-1.5">
-              {[
-                { id: 'credit_card' as PaymentMethod, label: 'Cartão' },
-                { id: 'pix' as PaymentMethod, label: 'PIX' },
-                { id: 'debit' as PaymentMethod, label: 'Débito' },
-                { id: 'cash' as PaymentMethod, label: 'Dinheiro' },
-              ].map((m) => {
-                const isSelected = paymentMethod === m.id;
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-0.5">
+              {availableCategories.map((cat) => {
+                const IconComp = getCategoryIcon(cat.icon);
+                const isSelected = category === cat.name;
+                const displayLabel = SHORT_CATEGORY_LABELS[cat.name] || cat.name;
 
                 return (
                   <button
-                    key={m.id}
+                    key={cat.id}
                     type="button"
-                    onClick={() => {
-                      setPaymentMethod(m.id);
-                      if (m.id !== 'credit_card') {
-                        setIsInstallment(false);
-                      }
-                    }}
-                    className={`py-2 text-xs font-bold rounded-xl border transition-all cursor-pointer active:scale-95 ${
+                    onClick={() => setCategory(cat.name)}
+                    className={`min-h-[44px] px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-left transition-colors border ${
                       isSelected
-                        ? 'bg-slate-800 text-white border-slate-600 shadow-xs'
-                        : 'bg-[#0A0D14] text-slate-400 border-slate-800 hover:text-white'
+                        ? type === 'expense'
+                          ? 'bg-red-500/15 border-red-500 text-white'
+                          : 'bg-emerald-500/15 border-emerald-500 text-white'
+                        : 'bg-[#0A0D14] border-slate-800/90 text-slate-300 hover:border-slate-700 hover:text-white'
                     }`}
                   >
-                    {m.label}
+                    <IconComp
+                      className="w-4 h-4 shrink-0"
+                      style={{ color: isSelected ? '#FFFFFF' : cat.color }}
+                    />
+                    <span className="truncate">{displayLabel}</span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* PARCELAMENTO: Disponível SOMENTE quando o método for Cartão */}
-          {type === 'expense' && paymentMethod === 'credit_card' && !editingTransaction && (
-            <div className="p-3.5 bg-[#0A0D14] border border-indigo-900/50 rounded-2xl space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                    <Layers size={15} />
-                  </div>
-                  <div>
-                    <span className="text-xs font-bold text-slate-200 block">
-                      Compra Parcelada no Cartão?
-                    </span>
-                    <span className="text-[11px] text-slate-400">
-                      Dividir o gasto automaticamente nos próximos meses
-                    </span>
-                  </div>
-                </div>
-
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={isInstallment}
-                    onChange={(e) => setIsInstallment(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                </label>
-              </div>
-
-              {isInstallment && (
-                <div className="pt-2 border-t border-slate-800/80 space-y-3 animate-in fade-in">
-                  
-                  {/* Presets de parcelas */}
-                  <div>
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
-                      Número de Parcelas
-                    </label>
-                    <div className="grid grid-cols-7 gap-1.5 mb-2">
-                      {[2, 3, 4, 5, 6, 10, 12].map((num) => (
-                        <button
-                          key={num}
-                          type="button"
-                          onClick={() => setInstallmentsCount(num)}
-                          className={`py-1.5 text-xs font-bold rounded-lg border transition-all cursor-pointer ${
-                            installmentsCount === num
-                              ? 'bg-indigo-600 text-white border-indigo-500 shadow-xs'
-                              : 'bg-[#141B29] text-slate-400 border-slate-800 hover:text-white'
-                          }`}
-                        >
-                          {num}x
-                        </button>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs text-slate-400">Ou digite a quantidade:</span>
-                      <input
-                        type="number"
-                        min={2}
-                        max={60}
-                        value={installmentsCount}
-                        onChange={(e) => setInstallmentsCount(Math.max(2, parseInt(e.target.value) || 2))}
-                        className="w-20 px-2.5 py-1 text-xs bg-[#141B29] border border-slate-800 rounded-lg text-white font-bold text-center"
-                      />
-                      <span className="text-xs text-slate-400">vezes</span>
-                    </div>
-                  </div>
-
-                  {/* Como calcular */}
-                  <div>
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-1.5">
-                      O valor digitado lá em cima é:
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setInstallmentMode('total_divided')}
-                        className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all ${
-                          installmentMode === 'total_divided'
-                            ? 'bg-indigo-950/50 border-indigo-500/50 text-indigo-200'
-                            : 'bg-[#141B29] border-slate-800 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        <span className="text-xs font-bold block">Valor Total da Compra</span>
-                        <span className="text-[10px] opacity-80">Dividir pelas {installmentsCount} parcelas</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setInstallmentMode('installment_value')}
-                        className={`p-2.5 rounded-xl border text-left cursor-pointer transition-all ${
-                          installmentMode === 'installment_value'
-                            ? 'bg-indigo-950/50 border-indigo-500/50 text-indigo-200'
-                            : 'bg-[#141B29] border-slate-800 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        <span className="text-xs font-bold block">Valor de Cada Parcela</span>
-                        <span className="text-[10px] opacity-80">R$ {numericAmount ? formatCurrency(numericAmount) : '0,00'} por mês</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Resumo explicativo fácil de entender */}
-                  {numericAmount > 0 && (
-                    <div className="p-3 bg-indigo-950/40 border border-indigo-800/50 rounded-xl flex items-start gap-2.5 text-indigo-200 text-xs">
-                      <Info size={16} className="shrink-0 text-indigo-400 mt-0.5" />
-                      <div>
-                        <p className="font-bold">
-                          Serão lançadas {installmentsCount} parcelas de {formatCurrency(singleInstallmentAmount)} cada.
-                        </p>
-                        <p className="text-[11px] text-indigo-300/80 mt-0.5 leading-relaxed">
-                          Total da compra: {formatCurrency(totalInstallmentsAmount)}. As parcelas serão distribuídas mês a mês no seu extrato automaticamente!
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Date with Quick Presets */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                {isInstallment && paymentMethod === 'credit_card'
-                  ? 'Data da 1ª Parcela'
-                  : type === 'income'
-                  ? 'Data da Entrada'
-                  : 'Data do Pagamento'}
+          {/* 4. Descrição (Opcional) e 5. Data */}
+          <div className="grid grid-cols-1 sm:grid-cols-5 gap-3">
+            <div className="sm:col-span-3">
+              <label htmlFor="tx-desc-input" className="block text-xs font-semibold text-slate-400 mb-1.5">
+                Descrição <span className="text-slate-500 font-normal">(opcional)</span>
               </label>
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setDate(todayStr)}
-                  className={`text-[11px] font-bold px-2 py-0.5 rounded-lg cursor-pointer transition-colors ${
-                    date === todayStr ? 'bg-emerald-950/60 text-emerald-400 border border-emerald-800/40' : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Hoje
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDate(yesterdayStr)}
-                  className={`text-[11px] font-bold px-2 py-0.5 rounded-lg cursor-pointer transition-colors ${
-                    date === yesterdayStr ? 'bg-slate-800 text-slate-200 border border-slate-700' : 'text-slate-400 hover:text-white'
-                  }`}
-                >
-                  Ontem
-                </button>
-              </div>
+              <input
+                id="tx-desc-input"
+                type="text"
+                placeholder="Ex: Almoço, Mercado..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full min-h-[46px] px-3.5 py-2.5 bg-[#0A0D14] border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-slate-600"
+              />
             </div>
-            <input
-              id="modal-input-date"
-              type="date"
-              required
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full px-4 py-2 text-sm bg-[#0A0D14] border border-slate-800 rounded-xl text-slate-100 focus:outline-none focus:border-emerald-500/50 cursor-pointer"
-            />
+
+            <div className="sm:col-span-2">
+              <label htmlFor="tx-date-input" className="block text-xs font-semibold text-slate-400 mb-1.5">
+                Data
+              </label>
+              <input
+                id="tx-date-input"
+                type="date"
+                required
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className="w-full min-h-[46px] px-3 py-2.5 bg-[#0A0D14] border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-slate-600 tabular-nums"
+              />
+            </div>
           </div>
 
-          {/* Status Toggle (Pago / Efetivado vs Pendente) */}
+          {/* Botão Salvar */}
           <div className="pt-1">
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
-              Situação deste lançamento
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                type="button"
-                onClick={() => setStatus('paid')}
-                className={`py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border transition-all cursor-pointer active:scale-[0.98] ${
-                  status === 'paid'
-                    ? 'bg-emerald-950/60 border-emerald-500/50 text-emerald-300 shadow-xs'
-                    : 'bg-[#0A0D14] border-slate-800 text-slate-400 hover:text-white'
-                }`}
-              >
-                <CheckCircle2 size={15} />
-                <span>{type === 'income' ? 'Já Recebido' : 'Já Pago / Efetivado'}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setStatus('pending')}
-                className={`py-2.5 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border transition-all cursor-pointer active:scale-[0.98] ${
-                  status === 'pending'
-                    ? 'bg-amber-950/60 border-amber-500/50 text-amber-300 shadow-xs'
-                    : 'bg-[#0A0D14] border-slate-800 text-slate-400 hover:text-white'
-                }`}
-              >
-                <Clock size={15} />
-                <span>{type === 'income' ? 'A Receber' : 'Pendente / A Pagar'}</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Optional Notes */}
-          <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1">
-              Observação <span className="text-slate-500 font-normal">(opcional)</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Ex: Compra para casa, presente, etc."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-4 py-2 text-xs bg-[#0A0D14] border border-slate-800 rounded-xl text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/50"
-            />
-          </div>
-
-          {/* Submit Button */}
-          <div className="pt-2">
             <button
               type="submit"
-              id="modal-submit-btn"
-              className={`w-full py-3.5 px-4 rounded-xl font-bold text-sm text-white shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98] ${
-                type === 'income'
-                  ? 'bg-emerald-600 hover:bg-emerald-500 shadow-emerald-950/50'
-                  : 'bg-rose-600 hover:bg-rose-500 shadow-rose-950/50'
+              disabled={numericAmount <= 0}
+              className={`w-full min-h-[52px] rounded-xl font-bold text-base text-white flex items-center justify-center gap-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                type === 'expense'
+                  ? 'bg-red-600 hover:bg-red-500 active:bg-red-700'
+                  : 'bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700'
               }`}
             >
-              <Check size={18} />
-              <span>
-                {editingTransaction
-                  ? 'Salvar Alterações'
-                  : isInstallment
-                  ? `Lançar Compra em ${installmentsCount}x Parcelas`
-                  : type === 'income'
-                  ? 'Salvar Entrada'
-                  : 'Salvar Despesa'}
-              </span>
+              <Check className="w-5 h-5" />
+              <span>Salvar {type === 'expense' ? 'Gasto' : 'Ganho'}</span>
             </button>
-          </div>
 
+            {justSaved && !editingTransaction && (
+              <p className="text-center text-xs font-medium text-emerald-400 mt-2">
+                Salvo! Campos limpos para o próximo lançamento.
+              </p>
+            )}
+          </div>
         </form>
       </div>
     </div>

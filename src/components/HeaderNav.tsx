@@ -20,7 +20,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Cloud,
-  Bell
+  Bell,
+  UserCheck
 } from 'lucide-react';
 import { getMonthNameAndYear, getPreviousMonth, getNextMonth, formatCurrency, formatDateBR } from '../utils/formatters';
 import { maskCPF } from './LoginScreen';
@@ -34,6 +35,7 @@ interface HeaderNavProps {
   userPhotoURL?: string;
   isCloudSynced?: boolean;
   onConnectCloud?: () => void;
+  onSwitchAccount?: () => void;
   hideBalance: boolean;
   onToggleHideBalance: () => void;
   currentMonth: string; // YYYY-MM
@@ -73,6 +75,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
   userPhotoURL,
   isCloudSynced,
   onConnectCloud,
+  onSwitchAccount,
   hideBalance,
   onToggleHideBalance,
   currentMonth,
@@ -489,14 +492,27 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
 
               {/* Automatic Save Indicator & Cloud Link */}
               {isCloudSynced ? (
-                <div
-                  className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 text-[11px] sm:text-xs font-semibold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 rounded-xl shadow-xs"
-                  title="Salvamento automático em tempo real no banco de dados Firebase Firestore"
-                >
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                  <Cloud size={13} className="shrink-0 hidden xs:inline" />
-                  <span className="hidden sm:inline">Salvo na Nuvem</span>
-                  <span className="sm:hidden text-[10px]">Salvo Auto</span>
+                <div className="flex items-center gap-1.5">
+                  <div
+                    className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 text-[11px] sm:text-xs font-semibold text-emerald-400 bg-emerald-950/50 border border-emerald-500/30 rounded-xl shadow-xs"
+                    title="Salvamento automático em tempo real no banco de dados Firebase Firestore"
+                  >
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                    <Cloud size={13} className="shrink-0 hidden xs:inline" />
+                    <span className="hidden sm:inline">Salvo na Nuvem</span>
+                    <span className="sm:hidden text-[10px]">Salvo Auto</span>
+                  </div>
+                  {onSwitchAccount && (
+                    <button
+                      id="btn-switch-account-header"
+                      onClick={onSwitchAccount}
+                      className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-[#0A0D14] hover:bg-slate-800 border border-slate-800/80 rounded-xl transition-all cursor-pointer active:scale-95 min-h-[38px]"
+                      title="Trocar para outra Conta Google"
+                    >
+                      <UserCheck size={13} className="text-emerald-400" />
+                      <span>Trocar Conta</span>
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center gap-1.5">

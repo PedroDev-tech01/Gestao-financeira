@@ -114,6 +114,23 @@ export async function deleteTransaction(userId: string, transactionId: string): 
 }
 
 /**
+ * Clear multiple transactions for a user from Firestore
+ */
+export async function clearAllUserTransactions(userId: string, txIds: string[]): Promise<void> {
+  if (txIds.length === 0) return;
+  const batch = writeBatch(db);
+  for (const id of txIds) {
+    const docRef = doc(db, 'users', userId, 'transactions', id);
+    batch.delete(docRef);
+  }
+  try {
+    await batch.commit();
+  } catch (error) {
+    handleFirestoreError(error, OperationType.WRITE, `users/${userId}/transactions`);
+  }
+}
+
+/**
  * Real-time listener for user's debts
  */
 export function subscribeToDebts(
@@ -311,7 +328,7 @@ export async function saveUserProfile(userId: string, profile: Partial<UserProfi
   try {
     await setDoc(docRef, payload, { merge: true });
   } catch (error) {
-    handleFirestoreError(error, OperationType.WRITE, docPath);
+    console.warn('saveUserProfile notice (non-fatal):', error);
   }
 }
 

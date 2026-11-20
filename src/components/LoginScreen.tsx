@@ -14,15 +14,8 @@ import {
   Loader2
 } from 'lucide-react';
 import { auth, googleProvider, signInWithPopup } from '../firebase';
-
-export interface AuthSessionUser {
-  name: string;
-  cpf: string;
-  uid?: string;
-  email?: string;
-  photoURL?: string;
-  isCloudSynced?: boolean;
-}
+import { AuthSessionUser } from '../types';
+export type { AuthSessionUser };
 
 interface LoginScreenProps {
   onLoginSuccess: (user: AuthSessionUser) => void;
@@ -84,16 +77,14 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
       setSuccessMsg('Autenticado com sucesso na nuvem Google!');
-      setTimeout(() => {
-        onLoginSuccess({
-          name: user.displayName || 'Usuário Google',
-          cpf: user.email || 'Conta Google',
-          uid: user.uid,
-          email: user.email || undefined,
-          photoURL: user.photoURL || undefined,
-          isCloudSynced: true,
-        });
-      }, 500);
+      onLoginSuccess({
+        name: user.displayName || 'Usuário Google',
+        cpf: user.email || 'Conta Google',
+        uid: user.uid,
+        email: user.email || undefined,
+        photoURL: user.photoURL || undefined,
+        isCloudSynced: true,
+      });
     } catch (error: any) {
       console.error('Firebase Google Auth error:', error);
       if (error?.code === 'auth/popup-closed-by-user') {

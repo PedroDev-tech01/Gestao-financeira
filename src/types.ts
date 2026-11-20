@@ -83,3 +83,12 @@ export interface InvestmentItem {
   updatedAt?: string;
   history?: InvestmentTransactionRecord[];
 }
+
+export interface AuthSessionUser {
+  name: string;
+  cpf: string;
+  uid?: string;
+  email?: string;
+  photoURL?: string;
+  isCloudSynced?: boolean;
+}

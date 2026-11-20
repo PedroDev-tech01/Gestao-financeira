@@ -37,6 +37,7 @@ import {
   subscribeToTransactions,
   saveTransaction as fsSaveTransaction,
   deleteTransaction as fsDeleteTransaction,
+  clearAllUserTransactions,
   subscribeToDebts,
   saveDebt as fsSaveDebt,
   deleteDebt as fsDeleteDebt,
@@ -46,6 +47,11 @@ import {
   syncLocalDataToFirestore,
   saveUserProfile
 } from './services/firestoreService';
+import {
+  loadUserAccountData,
+  saveUserAccountData,
+  purgeLegacySharedStorage
+} from './utils/userStorage';
 
 import {
   INITIAL_CATEGORIES,
@@ -91,8 +97,14 @@ export default function App() {
   const userName = currentUser ? currentUser.name : 'Minhas Finanças';
   const userCpf = currentUser ? currentUser.cpf : undefined;
 
+  // Load account data strictly isolated for currentUser on initial mount
+  const initialUserData = useMemo(() => {
+    purgeLegacySharedStorage();
+    return loadUserAccountData(currentUser);
+  }, []);
+
   const [hideBalance, setHideBalance] = useState<boolean>(() => {
-    return localStorage.getItem('gfp_hide_balance') === 'true';
+    return initialUserData.hideBalance;
   });
 
   const [currentMonth, setCurrentMonth] = useState<string>(() => {
@@ -105,79 +117,19 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'transactions' | 'investments' | 'debts' | 'charts'>('transactions');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Transactions state
+  // Transactions state (strictly isolated to current account)
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
-    const saved = localStorage.getItem('gfp_transactions');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        return parsed.filter((t: any) => !t.id?.startsWith('tx-seed-') && !['tx-1', 'tx-2', 'tx-3', 'tx-4', 'tx-5', 'tx-6', 'tx-7', 'tx-8', 'tx-9', 'tx-10'].includes(t.id));
-      } catch (e) {
-        return [];
-      }
-    }
-    return INITIAL_TRANSACTIONS;
+    return initialUserData.transactions;
   });
 
-  // Debts state (dívidas do momento)
+  // Debts state (strictly isolated to current account)
   const [debts, setDebts] = useState<DebtItem[]>(() => {
-    const saved = localStorage.getItem('aquigastos_debts');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return [];
-      }
-    }
-    return [];
+    return initialUserData.debts;
   });
 
-  // Investments state (dinheiro investido e reservas)
+  // Investments state (strictly isolated to current account)
   const [investments, setInvestments] = useState<InvestmentItem[]>(() => {
-    const saved = localStorage.getItem('aquigastos_investments');
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch {
-        return [];
-      }
-    }
-    return [
-      {
-        id: 'inv-1',
-        title: 'Reserva de Emergência (100% CDI)',
-        institution: 'Nubank',
-        category: 'emergency_fund',
-        investedAmount: 3500,
-        currentValue: 3680,
-        targetAmount: 12000,
-        yieldRate: '100% do CDI (Liquidez Diária)',
-        notes: 'Resgate imediato em caso de emergência ou despesas imprevistas.',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'inv-2',
-        title: 'Tesouro Selic 2029',
-        institution: 'Tesouro Direto / XP',
-        category: 'fixed_income',
-        investedAmount: 2000,
-        currentValue: 2115,
-        yieldRate: 'Taxa Selic + 0,15% a.a.',
-        notes: 'Garantia total do Governo Federal, seguro e conservador.',
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: 'inv-3',
-        title: 'Fundo Imobiliário MXRF11',
-        institution: 'Banco Inter',
-        category: 'variable_income',
-        investedAmount: 1000,
-        currentValue: 1065,
-        yieldRate: 'Dividend Yield ~11.8% a.a.',
-        notes: 'Rendimento mensal de aluguéis isento de IR.',
-        createdAt: new Date().toISOString(),
-      }
-    ];
+    return initialUserData.investments;
   });
 
   const [categories] = useState<CategoryItem[]>(INITIAL_CATEGORIES);
@@ -281,6 +233,7 @@ export default function App() {
 
   // Auth State Listener
   useEffect(() => {
+    purgeLegacySharedStorage();
     const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
       if (fbUser) {
         setFirebaseUid(fbUser.uid);
@@ -292,6 +245,14 @@ export default function App() {
           photoURL: fbUser.photoURL || undefined,
           isCloudSynced: true,
         };
+
+        // Instantly switch to this user's isolated local cache
+        const userAccount = loadUserAccountData(cloudUser);
+        setTransactions(userAccount.transactions);
+        setDebts(userAccount.debts);
+        setInvestments(userAccount.investments);
+        setHideBalance(userAccount.hideBalance);
+
         setCurrentUser(cloudUser);
         localStorage.setItem('aquigastos_active_session', JSON.stringify(cloudUser));
 
@@ -301,7 +262,7 @@ export default function App() {
             email: cloudUser.email,
             photoURL: cloudUser.photoURL,
             cpf: userCpf && !userCpf.includes('@') ? userCpf : undefined,
-            hideBalance,
+            hideBalance: userAccount.hideBalance,
           });
         } catch (e) {
           console.warn('Profile sync notice:', e);
@@ -311,7 +272,7 @@ export default function App() {
       }
     });
     return () => unsubscribe();
-  }, [hideBalance]);
+  }, []);
 
   // Real-time Firestore sync when authenticated with Firebase
   useEffect(() => {
@@ -322,22 +283,8 @@ export default function App() {
     const unsubTxs = subscribeToTransactions(
       uid,
       (cloudTxs) => {
-        // If user already had local transactions, and cloud is completely empty, offer / auto sync local data
-        if (cloudTxs.length === 0) {
-          const localTxs = JSON.parse(localStorage.getItem('gfp_transactions') || '[]');
-          const localDebts = JSON.parse(localStorage.getItem('aquigastos_debts') || '[]');
-          const localInvs = JSON.parse(localStorage.getItem('aquigastos_investments') || '[]');
-          if (localTxs.length > 0 || localDebts.length > 0 || localInvs.length > 0) {
-            syncLocalDataToFirestore(uid, localTxs, localDebts, localInvs)
-              .then(({ count }) => {
-                if (count > 0) {
-                  addToast('success', `${count} registros salvos na nuvem Firestore!`);
-                }
-              })
-              .catch(console.error);
-            return;
-          }
-        }
+        // ONLY set transactions for this specific user.
+        // NEVER auto-sync or pull data from another account or un-scoped storage!
         setTransactions(cloudTxs);
       },
       (err) => console.warn('Firestore transactions sync notice:', err)
@@ -366,22 +313,26 @@ export default function App() {
     };
   }, [firebaseUid]);
 
-  // Sync to local storage
+  // Sync to user-isolated local storage (never overwrites another user's storage)
   useEffect(() => {
-    localStorage.setItem('gfp_hide_balance', String(hideBalance));
-  }, [hideBalance]);
+    if (!currentUser) return;
+    saveUserAccountData(currentUser, { hideBalance });
+  }, [hideBalance, currentUser]);
 
   useEffect(() => {
-    localStorage.setItem('gfp_transactions', JSON.stringify(transactions));
-  }, [transactions]);
+    if (!currentUser) return;
+    saveUserAccountData(currentUser, { transactions });
+  }, [transactions, currentUser]);
 
   useEffect(() => {
-    localStorage.setItem('aquigastos_debts', JSON.stringify(debts));
-  }, [debts]);
+    if (!currentUser) return;
+    saveUserAccountData(currentUser, { debts });
+  }, [debts, currentUser]);
 
   useEffect(() => {
-    localStorage.setItem('aquigastos_investments', JSON.stringify(investments));
-  }, [investments]);
+    if (!currentUser) return;
+    saveUserAccountData(currentUser, { investments });
+  }, [investments, currentUser]);
 
   // Current Month Transactions
   const monthTransactions = useMemo(() => {
@@ -440,6 +391,17 @@ export default function App() {
   const handleLoginSuccess = (user: AuthSessionUser) => {
     setCurrentUser(user);
     localStorage.setItem('aquigastos_active_session', JSON.stringify(user));
+    if (user.uid) {
+      setFirebaseUid(user.uid);
+    } else {
+      setFirebaseUid(null);
+    }
+    // Load isolated data for this specific user
+    const userAccount = loadUserAccountData(user);
+    setTransactions(userAccount.transactions);
+    setDebts(userAccount.debts);
+    setInvestments(userAccount.investments);
+    setHideBalance(userAccount.hideBalance);
   };
 
   const handleLogout = async () => {
@@ -448,8 +410,14 @@ export default function App() {
     } catch (e) {
       console.error('Sign out error', e);
     }
+    // Completely wipe in-memory state so no data leaks to the next account!
     setCurrentUser(null);
+    setFirebaseUid(null);
+    setTransactions([]);
+    setDebts([]);
+    setInvestments([]);
     localStorage.removeItem('aquigastos_active_session');
+    purgeLegacySharedStorage();
     addToast('info', 'Você saiu da sua conta.');
   };
 
@@ -466,20 +434,84 @@ export default function App() {
         isCloudSynced: true,
       };
       setCurrentUser(cloudUser);
+      setFirebaseUid(user.uid);
       localStorage.setItem('aquigastos_active_session', JSON.stringify(cloudUser));
       addToast('success', 'Conta Google conectada ao Firebase Firestore!');
-
-      // Sync local records to cloud
-      const res = await syncLocalDataToFirestore(user.uid, transactions, debts, investments);
-      if (res.count > 0) {
-        addToast('success', `${res.count} registros sincronizados na nuvem!`);
-      }
     } catch (err: any) {
       console.error('Connect cloud error:', err);
       if (err?.code !== 'auth/popup-closed-by-user') {
         addToast('error', 'Falha ao conectar com o Google no momento.');
       }
     }
+  };
+
+  const handleSwitchAccount = async () => {
+    try {
+      await fbSignOut(auth);
+    } catch (e) {
+      console.warn('Sign out error on switch account:', e);
+    }
+    // Wipe active session and reset states immediately
+    setCurrentUser(null);
+    setFirebaseUid(null);
+    setTransactions([]);
+    setDebts([]);
+    setInvestments([]);
+    localStorage.removeItem('aquigastos_active_session');
+    purgeLegacySharedStorage();
+
+    // Trigger Google account selector with prompt: select_account
+    try {
+      googleProvider.setCustomParameters({ prompt: 'select_account' });
+      const result = await signInWithPopup(auth, googleProvider);
+      const user = result.user;
+      const cloudUser: AuthSessionUser = {
+        name: user.displayName || 'Usuário Google',
+        cpf: user.email || 'Conta Google',
+        uid: user.uid,
+        email: user.email || undefined,
+        photoURL: user.photoURL || undefined,
+        isCloudSynced: true,
+      };
+
+      const userAccount = loadUserAccountData(cloudUser);
+      setTransactions(userAccount.transactions);
+      setDebts(userAccount.debts);
+      setInvestments(userAccount.investments);
+      setHideBalance(userAccount.hideBalance);
+
+      setCurrentUser(cloudUser);
+      setFirebaseUid(user.uid);
+      localStorage.setItem('aquigastos_active_session', JSON.stringify(cloudUser));
+      addToast('success', `Conectado como ${cloudUser.name}!`);
+    } catch (err: any) {
+      console.error('Switch account error:', err);
+      if (err?.code !== 'auth/popup-closed-by-user') {
+        addToast('error', 'Não foi possível trocar de conta no momento.');
+      }
+    }
+  };
+
+  const handleClearAccountTransactions = async () => {
+    if (transactions.length === 0) return;
+    const confirmed = window.confirm(
+      'Deseja apagar todos os lançamentos desta conta? Os dados das suas outras contas permanecerão intactos.'
+    );
+    if (!confirmed) return;
+
+    const txIds = transactions.map(t => t.id);
+    if (firebaseUid) {
+      try {
+        await clearAllUserTransactions(firebaseUid, txIds);
+      } catch (e) {
+        console.error('Error clearing cloud transactions:', e);
+      }
+    }
+    setTransactions([]);
+    if (currentUser) {
+      saveUserAccountData(currentUser, { transactions: [] });
+    }
+    addToast('info', 'Todos os lançamentos desta conta foram apagados com sucesso.');
   };
 
   // Transaction Handlers
@@ -518,6 +550,7 @@ export default function App() {
         fsSaveTransaction(currentUser.uid, updatedTx).catch(console.error);
       }
       addToast('success', 'Lançamento atualizado!');
+      setIsTxModalOpen(false);
     } else {
       const newTx: Transaction = {
         ...(txData as Omit<Transaction, 'id'>),
@@ -528,9 +561,8 @@ export default function App() {
       if (currentUser?.uid) {
         fsSaveTransaction(currentUser.uid, newTx).catch(console.error);
       }
-      addToast('success', `${newTx.type === 'income' ? 'Receita' : 'Despesa'} registrada com sucesso!`);
+      addToast('success', `${newTx.type === 'income' ? 'Ganho' : 'Gasto'} salvo!`);
     }
-    setIsTxModalOpen(false);
   };
 
   const handleDeleteTransaction = (txId: string) => {
@@ -826,6 +858,7 @@ export default function App() {
         userPhotoURL={currentUser.photoURL}
         isCloudSynced={Boolean(currentUser.isCloudSynced || currentUser.uid)}
         onConnectCloud={handleConnectCloud}
+        onSwitchAccount={handleSwitchAccount}
         hideBalance={hideBalance}
         onToggleHideBalance={() => setHideBalance(!hideBalance)}
         currentMonth={currentMonth}
@@ -1106,6 +1139,7 @@ export default function App() {
               onToggleStatus={handleToggleTxStatus}
               onOpenExportModal={() => setIsExportModalOpen(true)}
               onOpenNewTransaction={() => handleOpenNewTransaction('expense')}
+              onClearAllTransactions={handleClearAccountTransactions}
               searchQuery={searchQuery}
               onSearchQueryChange={setSearchQuery}
             />
