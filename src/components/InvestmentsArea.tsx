@@ -315,13 +315,13 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
 
       {/* 3. DIDACTIC INVESTOR GUIDANCE BANNER */}
       <div className="bg-gradient-to-r from-[#131A29] to-[#0E131F] rounded-2xl p-4 border border-slate-800/80 shadow-xs">
-        <div className="flex items-start sm:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-start gap-3">
             <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center shrink-0 mt-0.5">
               <PiggyBank size={18} />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-bold text-slate-100 flex items-center gap-2">
+              <h4 className="text-sm font-bold text-slate-100 flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span>O Caminho do Investidor Inteligente</span>
                 <span className="text-[10px] text-teal-400 font-medium bg-teal-950/50 border border-teal-800/40 px-2 py-0.5 rounded-md">
                   Didático
@@ -334,7 +334,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
           </div>
           <button
             onClick={() => setShowGuide(!showGuide)}
-            className="text-xs font-semibold text-slate-300 hover:text-white bg-[#0A0D14] hover:bg-slate-800 border border-slate-800 px-3 py-1.5 rounded-xl transition-all cursor-pointer shrink-0 self-start sm:self-auto active:scale-95"
+            className="ml-12 sm:ml-0 text-xs font-semibold text-slate-300 hover:text-white bg-[#0A0D14] hover:bg-slate-800 border border-slate-800 px-3 py-1.5 rounded-xl transition-all cursor-pointer shrink-0 self-start sm:self-auto active:scale-95 whitespace-nowrap"
           >
             {showGuide ? 'Ocultar Dicas' : 'Ver Guia Completo'}
           </button>

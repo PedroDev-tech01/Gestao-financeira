@@ -11,11 +11,34 @@ import {
   updateProfile,
   User as FirebaseUser,
 } from 'firebase/auth';
-import { getFirestore, doc, getDocFromServer } from 'firebase/firestore';
+import {
+  getFirestore,
+  initializeFirestore,
+  persistentLocalCache,
+  persistentMultipleTabManager,
+  doc,
+  getDocFromServer,
+  Firestore,
+} from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId); /* CRITICAL: The app will break without this line */
+/* CRITICAL: o banco usa um ID próprio (firestoreDatabaseId); sem ele o app quebra. */
+function createDb(): Firestore {
+  try {
+    // Cache persistente no aparelho: abre os dados mais rápido e funciona offline,
+    // sincronizando sozinho quando a internet volta. Funciona com várias abas abertas.
+    return initializeFirestore(
+      app,
+      { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) },
+      firebaseConfig.firestoreDatabaseId
+    );
+  } catch (error) {
+    console.warn('Firestore persistent cache unavailable, using memory cache:', error);
+    return getFirestore(app, firebaseConfig.firestoreDatabaseId);
+  }
+}
+export const db = createDb();
 export const auth = getAuth(app);
 auth.languageCode = 'pt-BR';
 export const googleProvider = new GoogleAuthProvider();

@@ -29,8 +29,19 @@ async function startServer() {
     app.use(vite.middlewares);
   } else {
     const distPath = path.join(process.cwd(), 'dist');
-    app.use(express.static(distPath));
+    // Arquivos em /assets têm hash no nome: podem ficar em cache por 1 ano.
+    app.use(
+      '/assets',
+      express.static(path.join(distPath, 'assets'), { immutable: true, maxAge: '365d' })
+    );
+    // Demais arquivos (index.html, sw.js, manifest): sempre conferir se há versão nova.
+    app.use(
+      express.static(distPath, {
+        setHeaders: (res) => res.setHeader('Cache-Control', 'no-cache'),
+      })
+    );
     app.get('*', (_req, res) => {
+      res.setHeader('Cache-Control', 'no-cache');
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

@@ -94,3 +94,22 @@ body {
   padding-top: max(env(safe-area-inset-top, 0px), 12px);
 }
 
+
+/* Respeita quem prefere menos animação (acessibilidade e bateria) */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Números alinhados em colunas de valores */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

@@ -526,96 +526,70 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             const isIncome = t.type === 'income';
             const payInfo = t.paymentMethod ? PAYMENT_LABELS[t.paymentMethod] : null;
 
+            const statusButton = (extra: string) => (
+              <button
+                onClick={() => onToggleStatus(t.id)}
+                className={`${extra} text-[10px] font-semibold px-2 py-1 rounded-md items-center gap-1 cursor-pointer transition-all border active:scale-95 min-h-[26px] shrink-0 ${
+                  t.status === 'paid'
+                    ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30 hover:bg-emerald-900/60'
+                    : 'bg-amber-950/60 text-amber-300 border-amber-500/30 hover:bg-amber-900/60'
+                }`}
+                title="Toque para alternar entre Pago e A Pagar"
+              >
+                {t.status === 'paid' ? <CheckCircle2 size={12} /> : <Clock size={12} />}
+                <span>{t.status === 'paid' ? (isIncome ? 'Recebido' : 'Pago') : 'A Pagar'}</span>
+              </button>
+            );
+
+            const groupBadge = cat?.categoryGroup ? (
+              <span className={`hidden md:inline text-[10px] font-semibold px-1.5 py-px rounded border ${
+                cat.categoryGroup === 'essential'
+                  ? 'text-blue-400 bg-blue-950/40 border-blue-800/40'
+                  : (cat.categoryGroup === 'investment'
+                      ? 'text-emerald-400 bg-emerald-950/40 border-emerald-800/40'
+                      : (cat.categoryGroup === 'revenue' ? 'text-teal-400 bg-teal-950/40 border-teal-800/40' : 'text-purple-400 bg-purple-950/40 border-purple-800/40'))
+              }`}>
+                {cat.categoryGroup === 'essential' ? 'Essencial (50%)' : (cat.categoryGroup === 'investment' ? 'Reserva (20%)' : (cat.categoryGroup === 'revenue' ? 'Receita' : 'Estilo de Vida (30%)'))}
+              </span>
+            ) : null;
+
             return (
               <div
                 key={t.id}
-                className="py-3.5 flex items-center justify-between gap-3 group hover:bg-[#161F30]/50 px-2 sm:px-3 rounded-2xl transition-all duration-150"
+                className="py-3 sm:py-3.5 flex items-center gap-3 group hover:bg-[#161F30]/50 px-1.5 sm:px-3 rounded-2xl transition-colors duration-150"
               >
-                {/* Left: Category Icon & Details */}
-                <div className="flex items-center gap-3 min-w-0">
-                  <div
-                    className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shrink-0 border border-slate-700/60 shadow-xs transition-transform group-hover:scale-105"
-                    style={{ backgroundColor: cat ? cat.color : '#334155' }}
-                  >
-                    <CategoryIcon iconName={cat ? cat.icon : 'Layers'} size={18} />
-                  </div>
+                {/* Ícone da categoria */}
+                <div
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shrink-0 border border-white/10 shadow-xs"
+                  style={{ backgroundColor: cat ? cat.color : '#334155' }}
+                >
+                  <CategoryIcon iconName={cat ? cat.icon : 'Layers'} size={18} />
+                </div>
 
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex-1 min-w-0">
+                  {/* Linha 1: descrição + selos | valor */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
                       <HighlightMatch
                         text={t.description}
                         query={deferredSearchTerm}
-                        className="text-xs sm:text-sm font-bold text-slate-100 truncate"
+                        className="text-sm font-bold text-slate-100 truncate"
                       />
-
-                      {/* Installment Badge if purchase is installment */}
                       {t.installmentInfo && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-indigo-950/70 text-indigo-300 border border-indigo-800/60 flex items-center gap-1 shadow-xs">
+                        <span className="text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md bg-indigo-950/70 text-indigo-300 border border-indigo-800/60 flex items-center gap-1 shrink-0">
                           <Layers size={10} className="text-indigo-400" />
-                          <span>Parcela {t.installmentInfo.current}/{t.installmentInfo.total}</span>
+                          <span>{t.installmentInfo.current}/{t.installmentInfo.total}</span>
                         </span>
                       )}
-
-                      {/* Payment method badge */}
                       {payInfo && (
-                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${payInfo.color}`}>
+                        <span className={`hidden sm:inline text-[10px] font-semibold px-2 py-0.5 rounded-md border shrink-0 ${payInfo.color}`}>
                           {payInfo.label}
                         </span>
                       )}
-
-                      {/* Status Toggle Badge */}
-                      <button
-                        onClick={() => onToggleStatus(t.id)}
-                        className={`text-[10px] font-semibold px-2.5 py-1 rounded-md flex items-center gap-1 cursor-pointer transition-all border active:scale-95 min-h-[26px] ${
-                          t.status === 'paid'
-                            ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30 hover:bg-emerald-900/60 shadow-xs'
-                            : 'bg-amber-950/60 text-amber-300 border-amber-500/30 hover:bg-amber-900/60 shadow-xs'
-                        }`}
-                        title="Clique para alternar entre Pago e A Pagar"
-                      >
-                        {t.status === 'paid' ? <CheckCircle2 size={12} /> : <Clock size={12} />}
-                        <span>{t.status === 'paid' ? (isIncome ? 'Recebido' : 'Pago') : 'A Pagar'}</span>
-                      </button>
+                      {statusButton('hidden sm:flex')}
                     </div>
-
-                    <div className="flex items-center gap-1.5 text-[11px] text-slate-400 mt-1 flex-wrap">
-                      <span>{formatDateBR(t.date)}</span>
-                      <span>•</span>
-                      <HighlightMatch
-                        text={t.category}
-                        query={deferredSearchTerm}
-                        className="text-slate-300 font-medium"
-                      />
-                      {cat?.categoryGroup && (
-                        <span className={`text-[10px] font-semibold px-1.5 py-0.2 rounded border ${
-                          cat.categoryGroup === 'essential'
-                            ? 'text-blue-400 bg-blue-950/40 border-blue-800/40'
-                            : (cat.categoryGroup === 'investment'
-                                ? 'text-emerald-400 bg-emerald-950/40 border-emerald-800/40'
-                                : (cat.categoryGroup === 'revenue' ? 'text-teal-400 bg-teal-950/40 border-teal-800/40' : 'text-purple-400 bg-purple-950/40 border-purple-800/40'))
-                        }`}>
-                          {cat.categoryGroup === 'essential' ? 'Essencial (50%)' : (cat.categoryGroup === 'investment' ? 'Reserva (20%)' : (cat.categoryGroup === 'revenue' ? 'Receita' : 'Estilo de Vida (30%)'))}
-                        </span>
-                      )}
-                      {t.notes && (
-                        <>
-                          <span>•</span>
-                          <HighlightMatch
-                            text={t.notes}
-                            query={deferredSearchTerm}
-                            className="text-slate-400 italic truncate max-w-[150px] sm:max-w-[220px]"
-                          />
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right: Amount & Action Buttons */}
-                <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-                  <div className="text-right">
                     <span
-                      className={`text-sm sm:text-base font-black tracking-tight ${
+                      className={`text-sm sm:text-base font-black tracking-tight tabular-nums whitespace-nowrap shrink-0 ${
                         isIncome ? 'text-emerald-400' : 'text-rose-400'
                       }`}
                     >
@@ -623,25 +597,69 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                     </span>
                   </div>
 
-                  {/* Actions - visible and comfortable to tap on mobile and desktop */}
-                  <div className="flex items-center gap-0.5 sm:gap-1 opacity-90 sm:opacity-75 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => onEditTransaction(t)}
-                      className="p-1.5 sm:p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors cursor-pointer active:scale-90 min-h-[34px] min-w-[34px] flex items-center justify-center"
-                      title="Editar lançamento"
-                    >
-                      <Edit2 size={14} />
-                    </button>
-                    <button
-                      onClick={() => onDeleteTransaction(t.id)}
-                      className="p-1.5 sm:p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 rounded-xl transition-colors cursor-pointer active:scale-90 min-h-[34px] min-w-[34px] flex items-center justify-center"
-                      title="Excluir lançamento"
-                    >
-                      <Trash2 size={14} />
-                    </button>
+                  {/* Linha 2: data • categoria | (celular) status + ações */}
+                  <div className="flex items-center justify-between gap-2 mt-1">
+                    <div className="flex items-center gap-1.5 text-[11px] text-slate-400 min-w-0">
+                      <span className="shrink-0 tabular-nums">{formatDateBR(t.date).slice(0, 5)}<span className="hidden sm:inline">{formatDateBR(t.date).slice(5)}</span></span>
+                      <span className="shrink-0">•</span>
+                      <HighlightMatch
+                        text={t.category}
+                        query={deferredSearchTerm}
+                        className="text-slate-300 font-medium truncate"
+                      />
+                      {groupBadge}
+                      {t.notes && (
+                        <span className="hidden sm:inline-flex items-center gap-1.5 min-w-0">
+                          <span>•</span>
+                          <HighlightMatch
+                            text={t.notes}
+                            query={deferredSearchTerm}
+                            className="text-slate-400 italic truncate max-w-[220px]"
+                          />
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex sm:hidden items-center gap-0.5 shrink-0">
+                      {statusButton('flex')}
+                      <button
+                        onClick={() => onEditTransaction(t)}
+                        className="p-1 text-slate-400 hover:text-white rounded-lg cursor-pointer active:scale-90 min-h-[30px] min-w-[30px] flex items-center justify-center"
+                        title="Editar lançamento"
+                        aria-label="Editar lançamento"
+                      >
+                        <Edit2 size={14} />
+                      </button>
+                      <button
+                        onClick={() => onDeleteTransaction(t.id)}
+                        className="p-1 text-slate-400 hover:text-rose-400 rounded-lg cursor-pointer active:scale-90 min-h-[30px] min-w-[30px] flex items-center justify-center"
+                        title="Excluir lançamento"
+                        aria-label="Excluir lançamento"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
+                {/* Ações no computador/tablet */}
+                <div className="hidden sm:flex items-center gap-1 shrink-0 opacity-70 group-hover:opacity-100 focus-within:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => onEditTransaction(t)}
+                    className="p-2 text-slate-400 hover:text-white hover:bg-slate-800 rounded-xl transition-colors cursor-pointer active:scale-90 min-h-[34px] min-w-[34px] flex items-center justify-center"
+                    title="Editar lançamento"
+                    aria-label="Editar lançamento"
+                  >
+                    <Edit2 size={14} />
+                  </button>
+                  <button
+                    onClick={() => onDeleteTransaction(t.id)}
+                    className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 rounded-xl transition-colors cursor-pointer active:scale-90 min-h-[34px] min-w-[34px] flex items-center justify-center"
+                    title="Excluir lançamento"
+                    aria-label="Excluir lançamento"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </div>
               </div>
             );
           })

@@ -1,42 +1,25 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { HeaderNav } from './components/HeaderNav';
 import { OverviewCards } from './components/OverviewCards';
 import { TransactionList } from './components/TransactionList';
-import { TransactionModal } from './components/TransactionModal';
-import { ExportReportModal } from './components/ExportReportModal';
-import { CashFlowChartsArea } from './components/CashFlowChartsArea';
-import { LoginScreen } from './components/LoginScreen';
-import { DebtsArea } from './components/DebtsArea';
-import { DebtModal } from './components/DebtModal';
-import { PayDebtModal } from './components/PayDebtModal';
 import { QuickGuideBanner } from './components/QuickGuideBanner';
 import { FinancialEducationCard } from './components/FinancialEducationCard';
-import { InvestmentsArea } from './components/InvestmentsArea';
-import { InvestmentModal } from './components/InvestmentModal';
-import { InvestmentAporteModal } from './components/InvestmentAporteModal';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { ToastNotification, ToastMessage } from './components/ToastNotification';
-import { MonthPickerModal } from './components/MonthPickerModal';
-import { KeyboardShortcutsModal } from './components/KeyboardShortcutsModal';
-import { NotificationCenterModal } from './components/NotificationCenterModal';
 import { DueAlertsBanner } from './components/DueAlertsBanner';
-import { CloudMigrationModal } from './components/CloudMigrationModal';
-import { migrateLocalAccountToCloud } from './services/migrationService';
 import { getPendingMigration, isLocalOnlySession, isDemoSession } from './utils/legacyAccounts';
 import {
   getDueReminders,
   checkAndSendDailyNotification,
   DueReminder
 } from './services/notificationService';
-import { AuthSessionUser } from './components/LoginScreen';
+import type { AuthSessionUser } from './types';
 import {
-  auth,
-  googleProvider,
-  signInWithPopup,
-  fbSignOut,
-  onAuthStateChanged
-} from './firebase';
-import {
+  onAuthChange,
+  getCurrentFirebaseUser,
+  signOutCloud,
+  signInWithGoogle,
+  preloadCloud,
   subscribeToTransactions,
   saveTransaction as fsSaveTransaction,
   deleteTransaction as fsDeleteTransaction,
@@ -47,8 +30,9 @@ import {
   subscribeToInvestments,
   saveInvestment as fsSaveInvestment,
   deleteInvestment as fsDeleteInvestment,
-  saveUserProfile
-} from './services/firestoreService';
+  saveUserProfile,
+  migrateLocalAccountToCloud,
+} from './services/cloud';
 import {
   loadUserAccountData,
   saveUserAccountData,
@@ -82,6 +66,35 @@ import {
   Cloud,
   CloudUpload
 } from 'lucide-react';
+
+// Partes carregadas só quando forem usadas (deixa a abertura do app bem mais rápida)
+const LoginScreen = lazy(() => import('./components/LoginScreen').then((m) => ({ default: m.LoginScreen })));
+const TransactionModal = lazy(() => import('./components/TransactionModal').then((m) => ({ default: m.TransactionModal })));
+const ExportReportModal = lazy(() => import('./components/ExportReportModal').then((m) => ({ default: m.ExportReportModal })));
+const CashFlowChartsArea = lazy(() => import('./components/CashFlowChartsArea').then((m) => ({ default: m.CashFlowChartsArea })));
+const DebtsArea = lazy(() => import('./components/DebtsArea').then((m) => ({ default: m.DebtsArea })));
+const DebtModal = lazy(() => import('./components/DebtModal').then((m) => ({ default: m.DebtModal })));
+const PayDebtModal = lazy(() => import('./components/PayDebtModal').then((m) => ({ default: m.PayDebtModal })));
+const InvestmentsArea = lazy(() => import('./components/InvestmentsArea').then((m) => ({ default: m.InvestmentsArea })));
+const InvestmentModal = lazy(() => import('./components/InvestmentModal').then((m) => ({ default: m.InvestmentModal })));
+const InvestmentAporteModal = lazy(() => import('./components/InvestmentAporteModal').then((m) => ({ default: m.InvestmentAporteModal })));
+const MonthPickerModal = lazy(() => import('./components/MonthPickerModal').then((m) => ({ default: m.MonthPickerModal })));
+const KeyboardShortcutsModal = lazy(() => import('./components/KeyboardShortcutsModal').then((m) => ({ default: m.KeyboardShortcutsModal })));
+const NotificationCenterModal = lazy(() => import('./components/NotificationCenterModal').then((m) => ({ default: m.NotificationCenterModal })));
+const CloudMigrationModal = lazy(() => import('./components/CloudMigrationModal').then((m) => ({ default: m.CloudMigrationModal })));
+
+function TabLoadingSkeleton() {
+  return (
+    <div className="space-y-4 animate-pulse" aria-busy="true" aria-label="Carregando">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="h-32 rounded-3xl bg-slate-800/40 border border-slate-800/60" />
+        ))}
+      </div>
+      <div className="h-64 rounded-3xl bg-slate-800/30 border border-slate-800/60" />
+    </div>
+  );
+}
 
 export default function App() {
   // Authentication session state
@@ -232,12 +245,14 @@ export default function App() {
   }, []);
 
   // Active authenticated Firebase UID (null if using local mode / CPF)
-  const [firebaseUid, setFirebaseUid] = useState<string | null>(() => auth.currentUser?.uid || null);
+  const [firebaseUid, setFirebaseUid] = useState<string | null>(null);
 
   // Auth State Listener
   useEffect(() => {
     purgeLegacySharedStorage();
-    const unsubscribe = onAuthStateChanged(auth, async (fbUser) => {
+    // Baixa o Firebase em segundo plano: a tela já abriu com os dados em cache.
+    preloadCloud();
+    const unsubscribe = onAuthChange(async (fbUser) => {
       if (fbUser) {
         setFirebaseUid(fbUser.uid);
         const cloudUser: AuthSessionUser = {
@@ -272,6 +287,20 @@ export default function App() {
         }
       } else {
         setFirebaseUid(null);
+        // A sessão salva era de uma conta na nuvem, mas o login expirou/foi encerrado:
+        // volta para a tela de login (o cache local da conta continua guardado).
+        const saved = localStorage.getItem('aquigastos_active_session');
+        try {
+          if (saved && JSON.parse(saved)?.uid) {
+            localStorage.removeItem('aquigastos_active_session');
+            setCurrentUser(null);
+            setTransactions([]);
+            setDebts([]);
+            setInvestments([]);
+          }
+        } catch {
+          /* sessão local inválida: ignora */
+        }
       }
     });
     return () => unsubscribe();
@@ -283,11 +312,10 @@ export default function App() {
     if (!firebaseUid) return;
     const pending = getPendingMigration();
     if (!pending || pending.uid !== firebaseUid) return;
-    migrateLocalAccountToCloud(
-      { name: pending.name, cpf: pending.cpf },
-      firebaseUid,
-      auth.currentUser?.email
-    )
+    getCurrentFirebaseUser()
+      .then((fbUser) =>
+        migrateLocalAccountToCloud({ name: pending.name, cpf: pending.cpf }, firebaseUid, fbUser?.email)
+      )
       .then(({ count }) => {
         if (count > 0) addToast('success', `${count} itens do aparelho foram enviados para a nuvem.`);
       })
@@ -426,7 +454,7 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
-      await fbSignOut(auth);
+      await signOutCloud();
     } catch (e) {
       console.error('Sign out error', e);
     }
@@ -461,8 +489,9 @@ export default function App() {
   };
 
   const handleSwitchAccount = async () => {
+    const fbUser = await getCurrentFirebaseUser().catch(() => null);
     const isGoogleAccount = Boolean(
-      auth.currentUser?.providerData?.some((p) => p.providerId === 'google.com')
+      fbUser?.providerData?.some((p) => p.providerId === 'google.com')
     );
     if (!isGoogleAccount) {
       // Contas de e-mail: volta para a tela de login para escolher outra conta.
@@ -470,7 +499,7 @@ export default function App() {
       return;
     }
     try {
-      await fbSignOut(auth);
+      await signOutCloud();
     } catch (e) {
       console.warn('Sign out error on switch account:', e);
     }
@@ -485,8 +514,7 @@ export default function App() {
 
     // Trigger Google account selector with prompt: select_account
     try {
-      googleProvider.setCustomParameters({ prompt: 'select_account' });
-      const result = await signInWithPopup(auth, googleProvider);
+      const result = await signInWithGoogle(true);
       const user = result.user;
       const cloudUser: AuthSessionUser = {
         name: user.displayName || 'Usuário Google',
@@ -864,7 +892,11 @@ export default function App() {
 
   // Render Login Screen if not authenticated
   if (!currentUser) {
-    return <LoginScreen onLoginSuccess={handleLoginSuccess} />;
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-[#0A0C10]" />}>
+        <LoginScreen onLoginSuccess={handleLoginSuccess} />
+      </Suspense>
+    );
   }
 
   return (
@@ -903,17 +935,19 @@ export default function App() {
 
       {/* Fluxo para levar dados salvos só no aparelho para a nuvem */}
       {isMigrationOpen && (
-        <CloudMigrationModal
-          isOpen={isMigrationOpen}
-          localUser={currentUser}
-          itemCount={transactions.length + debts.length + investments.length}
-          onClose={() => setIsMigrationOpen(false)}
-          onMigrated={handleMigrationDone}
-        />
+        <Suspense fallback={null}>
+          <CloudMigrationModal
+            isOpen={isMigrationOpen}
+            localUser={currentUser}
+            itemCount={transactions.length + debts.length + investments.length}
+            onClose={() => setIsMigrationOpen(false)}
+            onMigrated={handleMigrationDone}
+          />
+        </Suspense>
       )}
 
       {/* Main Content Area */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 pt-4 sm:pt-5 pb-12">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 pt-4 sm:pt-5 pb-12">
 
         {isLocalOnlySession(currentUser) && (
           <div className="mb-5 flex flex-col sm:flex-row sm:items-center gap-3 justify-between bg-gradient-to-r from-amber-950/40 via-[#131A29] to-[#0E131F] border border-amber-700/40 rounded-2xl px-4 py-3">
@@ -941,6 +975,7 @@ export default function App() {
           onOpenNewExpense={() => handleOpenNewTransaction('expense')}
           onOpenDebtsTab={() => setActiveTab('debts')}
           onOpenInvestmentsTab={() => setActiveTab('investments')}
+          hasData={transactions.length > 0}
         />
 
         {/* Visual Due Dates & Bills Alert Banner */}
@@ -980,8 +1015,8 @@ export default function App() {
         )}
 
       {/* Navigation Tabs - 4 Clear Friendly Views */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between border-b border-slate-800/80 pb-3 mb-5 gap-3">
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:inline-flex lg:items-center gap-1.5 p-1 bg-gradient-to-r from-[#131A29] to-[#0E131F] rounded-2xl border border-slate-800/80 shadow-xs w-full lg:w-auto">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between sm:border-b border-slate-800/80 sm:pb-3 mb-5 gap-3">
+          <div className="hidden sm:grid sm:grid-cols-4 lg:inline-flex lg:items-center gap-1.5 p-1 bg-gradient-to-r from-[#131A29] to-[#0E131F] rounded-2xl border border-slate-800/80 shadow-xs w-full lg:w-auto">
             
             {/* Tab 1: Extrato & Resumo */}
             <button
@@ -995,8 +1030,8 @@ export default function App() {
             >
               <Receipt size={16} className={`shrink-0 ${activeTab === 'transactions' ? 'text-emerald-400' : ''}`} />
               <span className="truncate">
-                <span className="sm:hidden">Extrato</span>
-                <span className="hidden sm:inline">Extrato & Resumo</span>
+                <span className="2xl:hidden">Extrato</span>
+                <span className="hidden 2xl:inline">Extrato & Resumo</span>
               </span>
               {monthTransactions.length > 0 && (
                 <span className="text-[10px] font-bold bg-[#0A0D14] text-emerald-400 px-1.5 sm:px-2 py-0.5 rounded-full border border-emerald-500/20 shadow-xs shrink-0">
@@ -1017,8 +1052,8 @@ export default function App() {
             >
               <TrendingUp size={16} className={`shrink-0 ${activeTab === 'investments' ? 'text-emerald-400' : ''}`} />
               <span className="truncate">
-                <span className="sm:hidden">Investimentos</span>
-                <span className="hidden sm:inline">Investimentos & Reserva</span>
+                <span className="2xl:hidden">Investimentos</span>
+                <span className="hidden 2xl:inline">Investimentos & Reserva</span>
               </span>
               {investments.length > 0 && (
                 <span className="text-[10px] font-bold bg-emerald-950 text-emerald-300 px-1.5 sm:px-2 py-0.5 rounded-full border border-emerald-600/40 shadow-xs shrink-0">
@@ -1063,31 +1098,31 @@ export default function App() {
           </div>
 
           {/* Quick Action in Tab Bar */}
-          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 w-full lg:w-auto">
+          <div className="grid grid-cols-4 sm:flex sm:flex-wrap lg:flex-nowrap items-center gap-1.5 sm:gap-2 w-full lg:w-auto">
             <button
               onClick={() => handleOpenNewTransaction('income')}
-              className="justify-center text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950/30 hover:bg-emerald-900/40 border border-emerald-800/40 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+              className="justify-center text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950/30 hover:bg-emerald-900/40 border border-emerald-800/40 px-2 sm:px-3 py-2 sm:py-1.5 rounded-xl transition-all flex items-center gap-1 cursor-pointer active:scale-95"
             >
               <Plus size={13} />
               <span>Receita</span>
             </button>
             <button
               onClick={() => handleOpenNewTransaction('expense')}
-              className="justify-center text-xs font-bold text-rose-400 hover:text-rose-300 bg-rose-950/30 hover:bg-rose-900/40 border border-rose-800/40 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+              className="justify-center text-xs font-bold text-rose-400 hover:text-rose-300 bg-rose-950/30 hover:bg-rose-900/40 border border-rose-800/40 px-2 sm:px-3 py-2 sm:py-1.5 rounded-xl transition-all flex items-center gap-1 cursor-pointer active:scale-95"
             >
               <Plus size={13} />
               <span>Despesa</span>
             </button>
             <button
               onClick={handleOpenNewDebt}
-              className="justify-center text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-950/30 hover:bg-amber-900/40 border border-amber-800/40 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+              className="justify-center text-xs font-bold text-amber-400 hover:text-amber-300 bg-amber-950/30 hover:bg-amber-900/40 border border-amber-800/40 px-2 sm:px-3 py-2 sm:py-1.5 rounded-xl transition-all flex items-center gap-1 cursor-pointer active:scale-95"
             >
               <Plus size={13} />
               <span>Dívida</span>
             </button>
             <button
               onClick={handleOpenNewInvestment}
-              className="justify-center text-xs font-bold text-teal-400 hover:text-teal-300 bg-teal-950/30 hover:bg-teal-900/40 border border-teal-800/40 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1 cursor-pointer active:scale-95"
+              className="justify-center text-xs font-bold text-teal-400 hover:text-teal-300 bg-teal-950/30 hover:bg-teal-900/40 border border-teal-800/40 px-2 sm:px-3 py-2 sm:py-1.5 rounded-xl transition-all flex items-center gap-1 cursor-pointer active:scale-95"
             >
               <Plus size={13} />
               <span>Investir</span>
@@ -1201,128 +1236,166 @@ export default function App() {
         )}
 
         {/* TAB 2: INVESTIMENTOS & RESERVA */}
-        {activeTab === 'investments' && (
-          <InvestmentsArea
-            investments={investments}
-            onOpenNewInvestment={handleOpenNewInvestment}
-            onEditInvestment={handleEditInvestment}
-            onDeleteInvestment={handleDeleteInvestment}
-            onOpenAporte={handleOpenAporte}
-            hideBalance={hideBalance}
-            searchQuery={searchQuery}
-            onClearSearch={() => setSearchQuery('')}
-          />
-        )}
+        <Suspense fallback={<TabLoadingSkeleton />}>
+          {activeTab === 'investments' && (
+            <InvestmentsArea
+              investments={investments}
+              onOpenNewInvestment={handleOpenNewInvestment}
+              onEditInvestment={handleEditInvestment}
+              onDeleteInvestment={handleDeleteInvestment}
+              onOpenAporte={handleOpenAporte}
+              hideBalance={hideBalance}
+              searchQuery={searchQuery}
+              onClearSearch={() => setSearchQuery('')}
+            />
+          )}
 
-        {/* TAB 3: DÍVIDAS DO MOMENTO */}
-        {activeTab === 'debts' && (
-          <DebtsArea
-            debts={debts}
-            onOpenNewDebt={handleOpenNewDebt}
-            onEditDebt={handleEditDebt}
-            onDeleteDebt={handleDeleteDebt}
-            onOpenPayDebt={handleOpenPayDebt}
-            hideBalance={hideBalance}
-            searchQuery={searchQuery}
-            onClearSearch={() => setSearchQuery('')}
-          />
-        )}
+          {/* TAB 3: DÍVIDAS DO MOMENTO */}
+          {activeTab === 'debts' && (
+            <DebtsArea
+              debts={debts}
+              onOpenNewDebt={handleOpenNewDebt}
+              onEditDebt={handleEditDebt}
+              onDeleteDebt={handleDeleteDebt}
+              onOpenPayDebt={handleOpenPayDebt}
+              hideBalance={hideBalance}
+              searchQuery={searchQuery}
+              onClearSearch={() => setSearchQuery('')}
+            />
+          )}
 
-        {/* TAB 4: GRÁFICOS DE ENTRADAS E SAÍDAS */}
-        {activeTab === 'charts' && (
-          <CashFlowChartsArea
-            transactions={transactions}
-            currentMonth={currentMonth}
-            onChangeMonth={setCurrentMonth}
-            hideBalance={hideBalance}
-            onOpenNewIncome={() => handleOpenNewTransaction('income')}
-            onOpenNewExpense={() => handleOpenNewTransaction('expense')}
-          />
-        )}
+          {/* TAB 4: GRÁFICOS DE ENTRADAS E SAÍDAS */}
+          {activeTab === 'charts' && (
+            <CashFlowChartsArea
+              transactions={transactions}
+              currentMonth={currentMonth}
+              onChangeMonth={setCurrentMonth}
+              hideBalance={hideBalance}
+              onOpenNewIncome={() => handleOpenNewTransaction('income')}
+              onOpenNewExpense={() => handleOpenNewTransaction('expense')}
+            />
+          )}
+        </Suspense>
 
       </main>
 
       {/* MODALS */}
-      <TransactionModal
-        isOpen={isTxModalOpen}
-        onClose={() => setIsTxModalOpen(false)}
-        onSave={handleSaveTransaction}
-        editingTransaction={editingTx}
-        defaultType={defaultTxType}
-        categories={categories}
-      />
+      {isTxModalOpen && (
+        <Suspense fallback={null}>
+          <TransactionModal
+            isOpen={isTxModalOpen}
+            onClose={() => setIsTxModalOpen(false)}
+            onSave={handleSaveTransaction}
+            editingTransaction={editingTx}
+            defaultType={defaultTxType}
+            categories={categories}
+          />
+        </Suspense>
+      )}
 
-      <DebtModal
-        isOpen={isDebtModalOpen}
-        onClose={() => setIsDebtModalOpen(false)}
-        onSave={handleSaveDebt}
-        editingDebt={editingDebt}
-      />
+      {isDebtModalOpen && (
+        <Suspense fallback={null}>
+          <DebtModal
+            isOpen={isDebtModalOpen}
+            onClose={() => setIsDebtModalOpen(false)}
+            onSave={handleSaveDebt}
+            editingDebt={editingDebt}
+          />
+        </Suspense>
+      )}
 
-      <PayDebtModal
-        isOpen={isPayDebtModalOpen}
-        onClose={() => setIsPayDebtModalOpen(false)}
-        debt={payingDebt}
-        currentMonth={currentMonth}
-        onConfirmPayment={handleConfirmPayment}
-      />
+      {isPayDebtModalOpen && (
+        <Suspense fallback={null}>
+          <PayDebtModal
+            isOpen={isPayDebtModalOpen}
+            onClose={() => setIsPayDebtModalOpen(false)}
+            debt={payingDebt}
+            currentMonth={currentMonth}
+            onConfirmPayment={handleConfirmPayment}
+          />
+        </Suspense>
+      )}
 
-      <InvestmentModal
-        isOpen={isInvestmentModalOpen}
-        onClose={() => setIsInvestmentModalOpen(false)}
-        onSave={handleSaveInvestment}
-        editingInvestment={editingInvestment}
-      />
+      {isInvestmentModalOpen && (
+        <Suspense fallback={null}>
+          <InvestmentModal
+            isOpen={isInvestmentModalOpen}
+            onClose={() => setIsInvestmentModalOpen(false)}
+            onSave={handleSaveInvestment}
+            editingInvestment={editingInvestment}
+          />
+        </Suspense>
+      )}
 
-      <InvestmentAporteModal
-        isOpen={isAporteModalOpen}
-        onClose={() => setIsAporteModalOpen(false)}
-        investment={operatingInvestment}
-        currentMonth={currentMonth}
-        onConfirmOperation={handleConfirmInvestmentOperation}
-      />
+      {isAporteModalOpen && (
+        <Suspense fallback={null}>
+          <InvestmentAporteModal
+            isOpen={isAporteModalOpen}
+            onClose={() => setIsAporteModalOpen(false)}
+            investment={operatingInvestment}
+            currentMonth={currentMonth}
+            onConfirmOperation={handleConfirmInvestmentOperation}
+          />
+        </Suspense>
+      )}
 
-      <ExportReportModal
-        isOpen={isExportModalOpen}
-        onClose={() => setIsExportModalOpen(false)}
-        currentMonth={currentMonth}
-        transactions={transactions}
-        userName={userName}
-        availableMonths={availableMonths}
-      />
+      {isExportModalOpen && (
+        <Suspense fallback={null}>
+          <ExportReportModal
+            isOpen={isExportModalOpen}
+            onClose={() => setIsExportModalOpen(false)}
+            currentMonth={currentMonth}
+            transactions={transactions}
+            userName={userName}
+            availableMonths={availableMonths}
+          />
+        </Suspense>
+      )}
 
-      <MonthPickerModal
-        isOpen={isMonthPickerOpen}
-        onClose={() => setIsMonthPickerOpen(false)}
-        currentMonth={currentMonth}
-        onSelectMonth={(m) => {
-          setCurrentMonth(m);
-          addToast('info', `Mês alterado para ${m}`);
-        }}
-      />
+      {isMonthPickerOpen && (
+        <Suspense fallback={null}>
+          <MonthPickerModal
+            isOpen={isMonthPickerOpen}
+            onClose={() => setIsMonthPickerOpen(false)}
+            currentMonth={currentMonth}
+            onSelectMonth={(m) => {
+              setCurrentMonth(m);
+              addToast('info', `Mês alterado para ${m}`);
+            }}
+          />
+        </Suspense>
+      )}
 
-      <KeyboardShortcutsModal
-        isOpen={isShortcutsOpen}
-        onClose={() => setIsShortcutsOpen(false)}
-      />
+      {isShortcutsOpen && (
+        <Suspense fallback={null}>
+          <KeyboardShortcutsModal
+            isOpen={isShortcutsOpen}
+            onClose={() => setIsShortcutsOpen(false)}
+          />
+        </Suspense>
+      )}
 
       {/* Notification Center Modal */}
-      <NotificationCenterModal
-        isOpen={isNotificationCenterOpen}
-        onClose={() => setIsNotificationCenterOpen(false)}
-        reminders={dueReminders}
-        onPayDebt={handleOpenPayDebt}
-        onMarkExpensePaid={handleToggleTxStatus}
-        onGoToDebtsTab={() => {
-          setActiveTab('debts');
-          setIsNotificationCenterOpen(false);
-        }}
-        onGoToTransactionsTab={() => {
-          setActiveTab('transactions');
-          setIsNotificationCenterOpen(false);
-        }}
-        hideBalance={hideBalance}
-      />
+      {isNotificationCenterOpen && (
+        <Suspense fallback={null}>
+          <NotificationCenterModal
+            isOpen={isNotificationCenterOpen}
+            onClose={() => setIsNotificationCenterOpen(false)}
+            reminders={dueReminders}
+            onPayDebt={handleOpenPayDebt}
+            onMarkExpensePaid={handleToggleTxStatus}
+            onGoToDebtsTab={() => {
+              setActiveTab('debts');
+              setIsNotificationCenterOpen(false);
+            }}
+            onGoToTransactionsTab={() => {
+              setActiveTab('transactions');
+              setIsNotificationCenterOpen(false);
+            }}
+            hideBalance={hideBalance}
+          />
+        </Suspense>
+      )}
 
       {/* Mobile-first Bottom Bar for Phones */}
       <MobileBottomNav
