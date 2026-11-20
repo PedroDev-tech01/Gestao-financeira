@@ -2,12 +2,15 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Health check endpoint for connection verification
+    // Health check usado pelo app ao iniciar
     match /test/{testDocId} {
       allow get: if true;
     }
 
-    // Global hardened security helpers
+    // ------------------------------------------------------------------
+    // Funções auxiliares
+    // ------------------------------------------------------------------
+
     function isSignedIn() {
       return request.auth != null;
     }
@@ -16,24 +19,172 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // Match /users/{userId} - Strict per-user private sandbox
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // Campos criados ou alterados nesta escrita.
+    // Campos antigos que não mudam NÃO são verificados: assim documentos que já
+    // existem no banco (inclusive de versões antigas do app) continuam editáveis.
+    function changed() {
+      return resource == null
+        ? request.resource.data.keys().toSet()
+        : request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    // Verdadeiro quando o campo não foi tocado, foi removido, ou está sendo gravado
+    function untouched(k) {
+      return !changed().hasAny([k]) || !(k in incoming());
+    }
+
+    function okString(k, max) {
+      return untouched(k) || (incoming()[k] is string && incoming()[k].size() <= max);
+    }
+
+    function okAmount(k) {
+      return untouched(k)
+        || ((incoming()[k] is int || incoming()[k] is float)
+            && incoming()[k] >= 0
+            && incoming()[k] < 1000000000000);
+    }
+
+    function okEnum(k, values) {
+      return untouched(k) || incoming()[k] in values;
+    }
+
+    function okList(k, max) {
+      return untouched(k) || (incoming()[k] is list && incoming()[k].size() <= max);
+    }
+
+    function okMap(k) {
+      return untouched(k) || incoming()[k] is map;
+    }
+
+    function okBool(k) {
+      return untouched(k) || incoming()[k] is bool;
+    }
+
+    // O documento precisa pertencer ao usuário e usar o mesmo ID do caminho
+    function okIdentity(userId, docId) {
+      return (untouched('userId') || incoming().userId == userId)
+        && (untouched('id') || incoming().id == docId);
+    }
+
+    // Só os campos conhecidos podem ser criados/alterados (bloqueia campos "fantasma")
+    function onlyKnownFields(allowed) {
+      return changed().hasOnly(allowed);
+    }
+
+    function hasRequiredOnCreate(required) {
+      return resource != null || incoming().keys().hasAll(required);
+    }
+
+    // ------------------------------------------------------------------
+    // Validações por tipo de documento
+    // ------------------------------------------------------------------
+
+    function validTransaction(userId, docId) {
+      return docId.size() <= 128
+        && hasRequiredOnCreate(['id', 'userId', 'amount', 'type'])
+        && onlyKnownFields([
+          'id', 'userId', 'description', 'amount', 'type', 'category', 'date',
+          'status', 'updatedAt', 'paymentMethod', 'scope', 'notes', 'installmentInfo'
+        ])
+        && okIdentity(userId, docId)
+        && okAmount('amount')
+        && okEnum('type', ['income', 'expense'])
+        && okEnum('status', ['paid', 'pending'])
+        && okString('description', 200)
+        && okString('category', 80)
+        && okString('date', 40)
+        && okString('updatedAt', 40)
+        && okString('paymentMethod', 30)
+        && okString('scope', 30)
+        && okString('notes', 500)
+        && okMap('installmentInfo');
+    }
+
+    function validDebt(userId, docId) {
+      return docId.size() <= 128
+        && hasRequiredOnCreate(['id', 'userId', 'title', 'totalAmount', 'paidAmount'])
+        && onlyKnownFields([
+          'id', 'userId', 'title', 'totalAmount', 'paidAmount', 'status', 'updatedAt',
+          'createdAt', 'creditor', 'dueDate', 'notes', 'paymentHistory'
+        ])
+        && okIdentity(userId, docId)
+        && okAmount('totalAmount')
+        && okAmount('paidAmount')
+        && okEnum('status', ['active', 'negotiating', 'paid'])
+        && okString('title', 200)
+        && okString('creditor', 100)
+        && okString('dueDate', 40)
+        && okString('createdAt', 40)
+        && okString('updatedAt', 40)
+        && okString('notes', 500)
+        && okList('paymentHistory', 5000);
+    }
+
+    function validInvestment(userId, docId) {
+      return docId.size() <= 128
+        && hasRequiredOnCreate(['id', 'userId', 'title', 'investedAmount', 'currentValue'])
+        && onlyKnownFields([
+          'id', 'userId', 'title', 'category', 'institution', 'investedAmount', 'currentValue',
+          'updatedAt', 'createdAt', 'targetAmount', 'yieldRate', 'notes', 'history'
+        ])
+        && okIdentity(userId, docId)
+        && okAmount('investedAmount')
+        && okAmount('currentValue')
+        && okAmount('targetAmount')
+        && okString('title', 200)
+        && okString('category', 40)
+        && okString('institution', 100)
+        && okString('yieldRate', 50)
+        && okString('createdAt', 40)
+        && okString('updatedAt', 40)
+        && okString('notes', 500)
+        && okList('history', 5000);
+    }
+
+    function validProfile(userId) {
+      return onlyKnownFields([
+          'id', 'displayName', 'email', 'photoURL', 'cpf', 'monthlyBudget',
+          'hideBalance', 'createdAt', 'updatedAt'
+        ])
+        && (untouched('id') || incoming().id == userId)
+        && okString('displayName', 120)
+        && okString('email', 256)
+        && okString('photoURL', 1000)
+        && okString('cpf', 60)
+        && okAmount('monthlyBudget')
+        && okBool('hideBalance')
+        && okString('createdAt', 40)
+        && okString('updatedAt', 40);
+    }
+
+    // ------------------------------------------------------------------
+    // Cada usuário só enxerga e altera a própria pasta /users/{userId}
+    // ------------------------------------------------------------------
+
     match /users/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read, delete: if isOwner(userId);
+      allow create, update: if isOwner(userId) && validProfile(userId);
 
-      // Match /users/{userId}/transactions/{transactionId}
       match /transactions/{transactionId} {
-        allow read, write: if isOwner(userId);
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && validTransaction(userId, transactionId);
       }
 
-      // Match /users/{userId}/debts/{debtId}
       match /debts/{debtId} {
-        allow read, write: if isOwner(userId);
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && validDebt(userId, debtId);
       }
 
-      // Match /users/{userId}/investments/{investmentId}
       match /investments/{investmentId} {
-        allow read, write: if isOwner(userId);
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && validInvestment(userId, investmentId);
       }
     }
+
+    // Qualquer outro caminho é negado por padrão.
   }
 }
