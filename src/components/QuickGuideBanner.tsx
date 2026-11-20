@@ -17,6 +17,8 @@ interface QuickGuideBannerProps {
   onOpenNewExpense: () => void;
   onOpenDebtsTab: () => void;
   onOpenInvestmentsTab?: () => void;
+  /** Se o usuário já tem lançamentos, o guia começa fechado (a menos que ele tenha aberto antes). */
+  hasData?: boolean;
 }
 
 export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
@@ -24,9 +26,13 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
   onOpenNewExpense,
   onOpenDebtsTab,
   onOpenInvestmentsTab,
+  hasData = false,
 }) => {
   const [isOpen, setIsOpen] = useState<boolean>(() => {
-    return localStorage.getItem('aquigastos_show_guide') !== 'false';
+    const saved = localStorage.getItem('aquigastos_show_guide');
+    if (saved === 'true') return true;
+    if (saved === 'false') return false;
+    return !hasData;
   });
 
   const handleToggle = () => {
@@ -40,7 +46,7 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
       {/* Header bar of the guide */}
       <div 
         onClick={handleToggle}
-        className="px-5 py-3.5 flex items-center justify-between cursor-pointer select-none hover:bg-slate-800/30 transition-colors"
+        className="px-4 sm:px-5 py-3.5 flex items-center justify-between gap-3 cursor-pointer select-none hover:bg-slate-800/30 transition-colors"
       >
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
@@ -51,7 +57,7 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
               <span className="text-xs sm:text-sm font-bold text-slate-100">
                 Como usar o AquiGastos?
               </span>
-              <span className="text-[10px] font-semibold text-emerald-400 bg-emerald-950/50 border border-emerald-800/50 px-2 py-0.5 rounded-full">
+              <span className="hidden sm:inline text-[10px] font-semibold text-emerald-400 bg-emerald-950/50 border border-emerald-800/50 px-2 py-0.5 rounded-full">
                 Guia Rápido & Fácil
               </span>
             </div>
@@ -63,9 +69,10 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
 
         <button
           type="button"
-          className="flex items-center gap-1 text-xs font-semibold text-slate-400 hover:text-slate-200 bg-[#0A0D14] border border-slate-800/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer"
+          className="shrink-0 flex items-center gap-1 text-xs font-semibold text-slate-400 hover:text-slate-200 bg-[#0A0D14] border border-slate-800/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer whitespace-nowrap"
+          aria-expanded={isOpen}
         >
-          <span>{isOpen ? 'Ocultar Guia' : 'Ver Guia Explicativo'}</span>
+          <span>{isOpen ? 'Ocultar' : 'Ver guia'}</span>
           {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </button>
       </div>
@@ -203,16 +210,12 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
             </div>
 
             {/* Automatic Saving Reassurance Banner */}
-            <div className="mt-3.5 p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/25 flex items-center justify-between gap-2 flex-wrap">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                <span className="text-xs font-bold text-emerald-300">
-                  Salvamento 100% Automático:
-                </span>
-                <span className="text-xs text-slate-300">
-                  Tudo o que você cadastra, edita ou exclui é salvo imediatamente no mesmo segundo sem você precisar se preocupar.
-                </span>
-              </div>
+            <div className="col-span-full p-3 rounded-2xl bg-emerald-950/30 border border-emerald-500/25 flex items-start sm:items-center gap-2.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0 mt-1 sm:mt-0" />
+              <p className="text-xs text-slate-300 leading-relaxed">
+                <strong className="font-bold text-emerald-300">Salvamento automático:</strong>{' '}
+                tudo o que você cadastra, edita ou exclui é salvo na hora, sem precisar apertar nenhum botão.
+              </p>
             </div>
 
           </div>

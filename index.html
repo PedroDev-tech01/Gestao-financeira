@@ -10,6 +10,15 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#0A0D14" />
+    <meta name="color-scheme" content="dark" />
+    <!-- Fundo escuro já no primeiro quadro: evita a "piscada" branca enquanto o app carrega -->
+    <style>
+      html, body { background: #0A0D14; margin: 0; }
+      #boot-splash { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+      #boot-splash img { width: 56px; height: 56px; border-radius: 16px; opacity: .9; animation: boot-pulse 1.2s ease-in-out infinite; }
+      @keyframes boot-pulse { 50% { opacity: .45; } }
+      @media (prefers-reduced-motion: reduce) { #boot-splash img { animation: none; } }
+    </style>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="AquiGastos" />
@@ -25,7 +34,7 @@
     <link rel="manifest" href="/manifest.json" />
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div id="boot-splash"><img src="/icon.svg" alt="" /></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

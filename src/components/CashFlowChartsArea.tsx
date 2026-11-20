@@ -267,14 +267,14 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
         </div>
 
         {/* 3 Quick Clean Badges with Harmonious Icons */}
-        <div className="grid grid-cols-3 gap-3 mt-4 pt-3.5 border-t border-slate-800/80 text-xs">
+        <div className="grid grid-cols-1 min-[420px]:grid-cols-3 gap-2.5 sm:gap-3 mt-4 pt-3.5 border-t border-slate-800/80 text-xs">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
               <TrendingUp size={15} />
             </div>
             <div>
               <span className="text-slate-400 block text-[10px] sm:text-[11px] font-medium uppercase tracking-wider">Entradas</span>
-              <span className="font-extrabold text-emerald-400 text-xs sm:text-base">
+              <span className="font-extrabold text-emerald-400 text-sm sm:text-base whitespace-nowrap tabular-nums">
                 {hideBalance ? '••••••' : `+ ${formatCurrency(totals.totalIncome)}`}
               </span>
             </div>
@@ -286,7 +286,7 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
             </div>
             <div>
               <span className="text-slate-400 block text-[10px] sm:text-[11px] font-medium uppercase tracking-wider">Saídas</span>
-              <span className="font-extrabold text-rose-400 text-xs sm:text-base">
+              <span className="font-extrabold text-rose-400 text-sm sm:text-base whitespace-nowrap tabular-nums">
                 {hideBalance ? '••••••' : `- ${formatCurrency(totals.totalExpense)}`}
               </span>
             </div>
@@ -298,7 +298,7 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
             </div>
             <div>
               <span className="text-slate-400 block text-[10px] sm:text-[11px] font-medium uppercase tracking-wider">Saldo Líquido</span>
-              <span className={`font-extrabold text-xs sm:text-base ${totals.net >= 0 ? 'text-slate-100' : 'text-rose-400'}`}>
+              <span className={`font-extrabold text-sm sm:text-base whitespace-nowrap tabular-nums ${totals.net >= 0 ? 'text-slate-100' : 'text-rose-400'}`}>
                 {hideBalance ? '••••••' : (totals.net >= 0 ? `+ ${formatCurrency(totals.net)}` : `- ${formatCurrency(Math.abs(totals.net))}`)}
               </span>
             </div>
@@ -350,7 +350,7 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
           <div className="w-full h-72 sm:h-80">
             <ResponsiveContainer width="100%" height="100%">
               {chartStyle === 'bars' ? (
-                <BarChart data={activeChartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                <BarChart data={activeChartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }} barGap={1} barCategoryGap="12%">
                   <CartesianGrid strokeDasharray="3 3" stroke="#1E293B" vertical={false} />
                   <XAxis
                     dataKey="shortLabel"
@@ -367,8 +367,8 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
                     tickFormatter={formatYAxis}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar dataKey="income" name="Entradas" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={22} />
-                  <Bar dataKey="expense" name="Saídas" fill="#F43F5E" radius={[4, 4, 0, 0]} maxBarSize={22} />
+                  <Bar dataKey="income" name="Entradas" fill="#10B981" radius={[4, 4, 0, 0]} maxBarSize={22} minPointSize={2} />
+                  <Bar dataKey="expense" name="Saídas" fill="#F43F5E" radius={[4, 4, 0, 0]} maxBarSize={22} minPointSize={2} />
                 </BarChart>
               ) : (
                 <AreaChart data={activeChartData} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>

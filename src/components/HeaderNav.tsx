@@ -24,7 +24,7 @@ import {
   UserCheck
 } from 'lucide-react';
 import { getMonthNameAndYear, getPreviousMonth, getNextMonth, formatCurrency, formatDateBR } from '../utils/formatters';
-import { maskCPF } from './LoginScreen';
+import { maskCPF } from '../utils/cpf';
 import { PWAInstallButton } from './PWAInstallButton';
 import { Transaction, DebtItem, InvestmentItem, InvestmentCategory } from '../types';
 
@@ -371,7 +371,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
               {/* DESKTOP SEARCH BAR (Tablets & Desktops) */}
               <div
                 ref={searchContainerRef}
-                className="hidden md:block relative flex-1 max-w-xs lg:max-w-sm"
+                className="hidden md:block relative flex-1 min-w-[150px] max-w-xs lg:max-w-sm"
               >
               <div className="relative">
                 <Search
@@ -466,7 +466,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                 >
                   <Bell
                     size={16}
-                    className={notificationCount > 0 ? 'text-amber-400 animate-bounce' : 'text-slate-400'}
+                    className={notificationCount > 0 ? 'text-amber-400' : 'text-slate-400'}
                   />
                   {notificationCount > 0 && (
                     <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-slate-950 font-black text-[10px] rounded-full flex items-center justify-center shadow-md">
@@ -480,7 +480,7 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                 <button
                   id="btn-shortcuts"
                   onClick={onOpenKeyboardShortcuts}
-                  className="hidden md:flex p-2 text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 rounded-xl transition-colors border border-slate-800/80 cursor-pointer active:scale-95 min-h-[38px] min-w-[38px] items-center justify-center"
+                  className="hidden 2xl:flex p-2 text-slate-400 hover:text-slate-100 hover:bg-slate-800/80 rounded-xl transition-colors border border-slate-800/80 cursor-pointer active:scale-95 min-h-[38px] min-w-[38px] items-center justify-center"
                   title="Ver Atalhos de Teclado (Atalho: ?)"
                 >
                   <Keyboard size={16} />
@@ -499,14 +499,14 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                   >
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
                     <Cloud size={13} className="shrink-0 hidden xs:inline" />
-                    <span className="hidden sm:inline">Salvo na Nuvem</span>
-                    <span className="sm:hidden text-[10px]">Salvo Auto</span>
+                    <span className="hidden 2xl:inline">Salvo na Nuvem</span>
+                    <span className="2xl:hidden text-[10px]">Nuvem</span>
                   </div>
                   {onSwitchAccount && (
                     <button
                       id="btn-switch-account-header"
                       onClick={onSwitchAccount}
-                      className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-[#0A0D14] hover:bg-slate-800 border border-slate-800/80 rounded-xl transition-all cursor-pointer active:scale-95 min-h-[38px]"
+                      className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-[#0A0D14] hover:bg-slate-800 border border-slate-800/80 rounded-xl transition-all cursor-pointer active:scale-95 min-h-[38px]"
                       title="Trocar de conta"
                     >
                       <UserCheck size={13} className="text-emerald-400" />
@@ -521,14 +521,14 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                     title="Salvamento automático ativado neste aparelho"
                   >
                     <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
-                    <span className="hidden sm:inline">Salvo no Aparelho</span>
-                    <span className="sm:hidden text-[10px]">Salvo Auto</span>
+                    <span className="hidden 2xl:inline">Salvo no Aparelho</span>
+                    <span className="2xl:hidden text-[10px]">Local</span>
                   </div>
                   {onConnectCloud && (
                     <button
                       id="btn-connect-cloud-header"
                       onClick={onConnectCloud}
-                      className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 hover:text-white bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/40 rounded-xl transition-all cursor-pointer active:scale-[0.98] min-h-[38px]"
+                      className="hidden 2xl:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-semibold text-emerald-300 hover:text-white bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-500/40 rounded-xl transition-all cursor-pointer active:scale-[0.98] min-h-[38px]"
                       title="Criar conta na nuvem e levar seus dados junto"
                     >
                       <Cloud size={13} className="text-emerald-400" />
@@ -542,11 +542,11 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                 <button
                   id="btn-export"
                   onClick={onOpenExportModal}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-[#0A0D14] hover:bg-slate-800 border border-slate-800/80 rounded-xl transition-colors cursor-pointer active:scale-[0.98] min-h-[38px]"
+                  className="hidden sm:flex items-center justify-center gap-1.5 px-2.5 2xl:px-3 py-2 text-xs font-semibold text-slate-300 hover:text-white bg-[#0A0D14] hover:bg-slate-800 border border-slate-800/80 rounded-xl transition-colors cursor-pointer active:scale-[0.98] min-h-[38px] min-w-[38px]"
                   title="Exportar dados em PDF ou CSV"
                 >
                   <Download size={14} className="text-emerald-400" />
-                  <span>Exportar</span>
+                  <span className="hidden 2xl:inline">Exportar</span>
                 </button>
               )}
 
@@ -557,7 +557,8 @@ export const HeaderNav: React.FC<HeaderNavProps> = ({
                 title="Adicionar Lançamento (Atalho: N)"
               >
                 <Plus size={16} />
-                <span>Novo Lançamento</span>
+                <span className="hidden lg:inline 2xl:hidden">Novo</span>
+                <span className="hidden 2xl:inline">Novo Lançamento</span>
               </button>
 
               {onLogout && (
