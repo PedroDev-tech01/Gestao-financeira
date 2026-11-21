@@ -151,7 +151,7 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
     const netVal = incVal - expVal;
 
     return (
-      <div className="bg-[#0A0D14] border border-slate-700/80 p-3 rounded-2xl shadow-xl text-xs space-y-1.5 min-w-[170px]">
+      <div className="bg-[#15171C] border border-slate-700/80 p-3 rounded-2xl text-xs space-y-1.5 min-w-[170px]">
         <div className="font-bold text-slate-100 border-b border-slate-800 pb-1.5 flex items-center justify-between">
           <span>{label}</span>
           <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
@@ -186,7 +186,7 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
     <div className="space-y-4">
       
       {/* Clean Header Controls with Harmonious Theme */}
-      <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-3xl p-5 border border-slate-800/80 shadow-md">
+      <div className="bg-slate-900 rounded-3xl p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           
           <div>
@@ -201,7 +201,7 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
 
           <div className="flex items-center gap-2 flex-wrap">
             {/* Granularity switch */}
-            <div className="flex items-center bg-[#0A0D14] p-0.5 rounded-xl border border-slate-800/80 text-xs">
+            <div className="flex items-center bg-[#15171C] p-0.5 rounded-xl border border-slate-800/80 text-xs">
               <button
                 onClick={() => setGranularity('daily')}
                 className={`px-3 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer active:scale-95 ${
@@ -221,7 +221,7 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
             </div>
 
             {/* Chart Style */}
-            <div className="flex items-center bg-[#0A0D14] p-0.5 rounded-xl border border-slate-800/80 text-xs">
+            <div className="flex items-center bg-[#15171C] p-0.5 rounded-xl border border-slate-800/80 text-xs">
               <button
                 onClick={() => setChartStyle('bars')}
                 className={`px-2.5 py-1.5 rounded-lg font-semibold transition-colors cursor-pointer active:scale-95 ${
@@ -242,7 +242,7 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
 
             {/* Month switch if daily */}
             {granularity === 'daily' && (
-              <div className="flex items-center bg-[#0A0D14] rounded-xl border border-slate-800/80 p-0.5">
+              <div className="flex items-center bg-[#15171C] rounded-xl border border-slate-800/80 p-0.5">
                 <button
                   onClick={() => onChangeMonth(getPreviousMonth(currentMonth))}
                   className="p-1 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer active:scale-95"
@@ -269,24 +269,24 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
         {/* 3 Quick Clean Badges with Harmonious Icons */}
         <div className="grid grid-cols-1 min-[420px]:grid-cols-3 gap-2.5 sm:gap-3 mt-4 pt-3.5 border-t border-slate-800/80 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-slate-800 text-emerald-300 flex items-center justify-center shrink-0">
               <TrendingUp size={15} />
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px] sm:text-[11px] font-medium uppercase tracking-wider">Entradas</span>
-              <span className="font-extrabold text-emerald-400 text-sm sm:text-base whitespace-nowrap tabular-nums">
+              <span className="text-slate-400 block text-[10px] sm:text-[11px] font-medium ">Entradas</span>
+              <span className="font-semibold text-emerald-400 text-sm sm:text-base whitespace-nowrap tabular-nums">
                 {hideBalance ? '••••••' : `+ ${formatCurrency(totals.totalIncome)}`}
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 rounded-xl bg-slate-800 text-rose-300 flex items-center justify-center shrink-0">
               <TrendingDown size={15} />
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px] sm:text-[11px] font-medium uppercase tracking-wider">Saídas</span>
-              <span className="font-extrabold text-rose-400 text-sm sm:text-base whitespace-nowrap tabular-nums">
+              <span className="text-slate-400 block text-[10px] sm:text-[11px] font-medium ">Saídas</span>
+              <span className="font-semibold text-rose-400 text-sm sm:text-base whitespace-nowrap tabular-nums">
                 {hideBalance ? '••••••' : `- ${formatCurrency(totals.totalExpense)}`}
               </span>
             </div>
@@ -297,8 +297,8 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
               <Scale size={15} />
             </div>
             <div>
-              <span className="text-slate-400 block text-[10px] sm:text-[11px] font-medium uppercase tracking-wider">Saldo Líquido</span>
-              <span className={`font-extrabold text-sm sm:text-base whitespace-nowrap tabular-nums ${totals.net >= 0 ? 'text-slate-100' : 'text-rose-400'}`}>
+              <span className="text-slate-400 block text-[10px] sm:text-[11px] font-medium ">Saldo Líquido</span>
+              <span className={`font-semibold text-sm sm:text-base whitespace-nowrap tabular-nums ${totals.net >= 0 ? 'text-slate-100' : 'text-rose-400'}`}>
                 {hideBalance ? '••••••' : (totals.net >= 0 ? `+ ${formatCurrency(totals.net)}` : `- ${formatCurrency(Math.abs(totals.net))}`)}
               </span>
             </div>
@@ -307,17 +307,17 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
       </div>
 
       {/* Main Chart Card */}
-      <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-3xl p-5 sm:p-6 border border-slate-800/80 shadow-md">
+      <div className="bg-slate-900 rounded-3xl p-5 sm:p-6">
         
         {/* Legend */}
         <div className="flex items-center justify-between text-xs mb-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-xs shadow-emerald-500/50 inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-xs inline-block" />
               <span className="text-slate-300 font-medium">Entradas (Receitas)</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-xs shadow-rose-500/50 inline-block" />
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-xs inline-block" />
               <span className="text-slate-300 font-medium">Saídas (Despesas)</span>
             </div>
           </div>
@@ -334,13 +334,13 @@ export const CashFlowChartsArea: React.FC<CashFlowChartsAreaProps> = ({
             <div className="flex items-center justify-center gap-2">
               <button
                 onClick={onOpenNewIncome}
-                className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20 hover:bg-emerald-500/20 cursor-pointer active:scale-95"
+                className="text-xs font-bold text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20 hover:bg-emerald-500/20 cursor-pointer active:scale-95"
               >
                 + Entrada
               </button>
               <button
                 onClick={onOpenNewExpense}
-                className="text-xs font-bold text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-xl border border-rose-500/20 hover:bg-rose-500/20 cursor-pointer active:scale-95"
+                className="text-xs font-bold text-rose-400 bg-rose-500/10 px-3 py-1.5 rounded-full border border-rose-500/20 hover:bg-rose-500/20 cursor-pointer active:scale-95"
               >
                 + Saída
               </button>

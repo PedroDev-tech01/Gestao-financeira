@@ -21,10 +21,10 @@ export function TabLoadingSkeleton() {
     <div className="space-y-4 animate-pulse" aria-busy="true" aria-label="Carregando">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[0, 1, 2].map((i) => (
-          <div key={i} className="h-32 rounded-3xl bg-slate-800/40 border border-slate-800/60" />
+          <div key={i} className="h-32 rounded-3xl bg-slate-800/40" />
         ))}
       </div>
-      <div className="h-64 rounded-3xl bg-slate-800/30 border border-slate-800/60" />
+      <div className="h-64 rounded-3xl bg-slate-800/30" />
     </div>
   );
 }

@@ -209,7 +209,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="bg-[#131A29] border-t sm:border border-slate-800 rounded-t-2xl sm:rounded-2xl w-full max-w-md shadow-2xl overflow-hidden my-auto">
+      <div className="bg-[#1E2128] border-t sm: rounded-t-2xl sm:rounded-2xl w-full max-w-md overflow-hidden my-auto">
         {/* Top bar */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800/80">
           <h2 className="text-base font-bold text-white">
@@ -231,10 +231,10 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             <button
               type="button"
               onClick={() => handleTypeChange('expense')}
-              className={`min-h-[48px] rounded-xl font-bold text-sm transition-colors flex items-center justify-center ${
+              className={`min-h-[48px] rounded-full font-semibold text-sm transition-colors flex items-center justify-center ${
                 type === 'expense'
-                  ? 'bg-red-600 text-white shadow-sm'
-                  : 'bg-[#0A0D14] text-slate-400 border border-slate-800 hover:text-white'
+                  ? 'bg-slate-100 text-slate-950'
+                  : 'bg-[#15171C] text-slate-400 hover:text-white'
               }`}
             >
               Gasto
@@ -242,10 +242,10 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             <button
               type="button"
               onClick={() => handleTypeChange('income')}
-              className={`min-h-[48px] rounded-xl font-bold text-sm transition-colors flex items-center justify-center ${
+              className={`min-h-[48px] rounded-full font-semibold text-sm transition-colors flex items-center justify-center ${
                 type === 'income'
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'bg-[#0A0D14] text-slate-400 border border-slate-800 hover:text-white'
+                  ? 'bg-slate-100 text-slate-950'
+                  : 'bg-[#15171C] text-slate-400 hover:text-white'
               }`}
             >
               Ganho
@@ -258,15 +258,15 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
               Valor
             </label>
             <div
-              className={`flex items-center bg-[#0A0D14] border-2 rounded-xl px-4 py-3 transition-colors ${
+              className={`flex items-center bg-[#15171C] border-2 rounded-xl px-4 py-3 transition-colors ${
                 type === 'expense'
-                  ? 'border-slate-800 focus-within:border-red-500'
-                  : 'border-slate-800 focus-within:border-emerald-500'
+                  ? 'border-slate-800 focus-within:border-slate-500'
+                  : 'border-slate-800 focus-within:border-emerald-500/70'
               }`}
             >
               <span
                 className={`text-xl font-bold mr-2 select-none ${
-                  type === 'expense' ? 'text-red-400' : 'text-emerald-400'
+                  type === 'expense' ? 'text-slate-400' : 'text-emerald-400'
                 }`}
               >
                 R$
@@ -281,7 +281,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 placeholder="0,00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value.replace(/[^0-9.,]/g, ''))}
-                className="w-full bg-transparent text-2xl sm:text-3xl font-extrabold text-white placeholder-slate-700 focus:outline-none tabular-nums"
+                className="w-full bg-transparent text-2xl sm:text-3xl font-semibold text-white placeholder-slate-700 focus:outline-none tabular-nums"
               />
             </div>
           </div>
@@ -302,17 +302,15 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                     key={cat.id}
                     type="button"
                     onClick={() => setCategory(cat.name)}
-                    className={`min-h-[44px] px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 text-left transition-colors border ${
+                    className={`min-h-[44px] px-3 py-2 rounded-full text-xs font-semibold flex items-center gap-2 text-left transition-colors border ${
                       isSelected
-                        ? type === 'expense'
-                          ? 'bg-red-500/15 border-red-500 text-white'
-                          : 'bg-emerald-500/15 border-emerald-500 text-white'
-                        : 'bg-[#0A0D14] border-slate-800/90 text-slate-300 hover:border-slate-700 hover:text-white'
+                        ? 'bg-slate-800 border-slate-400 text-white'
+                        : 'bg-[#15171C] border-slate-800/90 text-slate-300 hover:border-slate-700 hover:text-white'
                     }`}
                   >
                     <IconComp
                       className="w-4 h-4 shrink-0"
-                      style={{ color: isSelected ? '#FFFFFF' : cat.color }}
+                      style={{ color: cat.color }}
                     />
                     <span className="truncate">{displayLabel}</span>
                   </button>
@@ -333,7 +331,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 placeholder="Ex: Almoço, Mercado..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full min-h-[46px] px-3.5 py-2.5 bg-[#0A0D14] border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-slate-600"
+                className="w-full min-h-[46px] px-3.5 py-2.5 bg-[#15171C] border border-slate-800 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-slate-600"
               />
             </div>
 
@@ -347,7 +345,7 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full min-h-[46px] px-3 py-2.5 bg-[#0A0D14] border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-slate-600 tabular-nums"
+                className="w-full min-h-[46px] px-3 py-2.5 bg-[#15171C] border border-slate-800 rounded-xl text-sm text-white focus:outline-none focus:border-slate-600 tabular-nums"
               />
             </div>
           </div>
@@ -357,10 +355,8 @@ export const TransactionModal: React.FC<TransactionModalProps> = ({
             <button
               type="submit"
               disabled={numericAmount <= 0}
-              className={`w-full min-h-[52px] rounded-xl font-bold text-base text-white flex items-center justify-center gap-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
-                type === 'expense'
-                  ? 'bg-red-600 hover:bg-red-500 active:bg-red-700'
-                  : 'bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700'
+              className={`w-full min-h-[52px] rounded-full font-semibold text-base text-slate-950 flex items-center justify-center gap-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                'bg-slate-100 hover:bg-white active:bg-slate-200'
               }`}
             >
               <Check className="w-5 h-5" />

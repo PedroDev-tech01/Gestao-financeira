@@ -1,6 +1,6 @@
 import React from 'react';
 import { Building2, ArrowRight, Sparkles } from 'lucide-react';
-import { OverviewCards } from './OverviewCards';
+import { MonthHero } from './MonthHero';
 import { FinancialEducationCard } from './FinancialEducationCard';
 import { TransactionList } from './TransactionList';
 import { formatCurrency } from '../utils/formatters';
@@ -28,6 +28,10 @@ interface TransactionsTabProps {
   handleClearAccountTransactions: () => void;
   openExport: () => void;
   goToTab: (tab: 'investments' | 'debts' | 'charts') => void;
+  /** Aparece logo abaixo do resumo do mês (ex.: contas vencendo). */
+  afterHero?: React.ReactNode;
+  /** Aparece no fim da aba (ex.: guia de uso). */
+  footer?: React.ReactNode;
 }
 
 /** Aba "Extrato": resumo do mês, dicas 50/30/20, aviso de dívidas e a lista de lançamentos. */
@@ -53,108 +57,100 @@ export const TransactionsTab: React.FC<TransactionsTabProps> = ({
   handleClearAccountTransactions,
   openExport,
   goToTab,
+  afterHero,
+  footer,
 }) => {
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
+      <MonthHero
+        monthTransactions={monthTransactions}
+        categories={categories}
+        monthIncome={monthIncome}
+        monthExpense={monthExpense}
+        netBalance={netBalance}
+        pendingExpense={pendingExpense}
+        hideBalance={hideBalance}
+        onOpenCharts={() => goToTab('charts')}
+      />
 
-    {/* Overview KPI Cards */}
-    <OverviewCards
-      totalBalance={netBalance}
-      monthIncome={monthIncome}
-      monthExpense={monthExpense}
-      netBalance={netBalance}
-      hideBalance={hideBalance}
-      pendingIncome={pendingIncome}
-      pendingExpense={pendingExpense}
-      onOpenNewExpense={() => handleOpenNewTransaction('expense')}
-      onOpenNewIncome={() => handleOpenNewTransaction('income')}
-      onOpenCharts={() => goToTab('charts')}
-    />
+      {afterHero}
 
-    {/* Didactic 50/30/20 Financial Intelligence & Recommendations */}
-    <FinancialEducationCard
-      monthIncome={monthIncome}
-      monthExpense={monthExpense}
-      monthTransactions={monthTransactions}
-      hideBalance={hideBalance}
-      onOpenInvestments={() => goToTab('investments')}
-    />
-
-    {/* Reassuring Active Debts Banner if any exist */}
-    {activeDebts.length > 0 && (
-      <div className="bg-gradient-to-r from-[#131A29] to-[#0E131F] rounded-2xl p-4 border border-amber-900/40 hover:border-amber-500/40 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-            <Building2 size={18} />
+      {hasNoData && (
+        <div className="bg-slate-900 rounded-3xl p-6 text-center">
+          <div className="w-12 h-12 bg-slate-800 text-slate-100 rounded-2xl flex items-center justify-center mx-auto mb-3">
+            <Sparkles size={22} />
           </div>
-          <div>
-            <span className="text-xs font-bold text-slate-100 block">
-              Você tem {activeDebts.length} {activeDebts.length === 1 ? 'dívida ativa cadastrada' : 'dívidas ativas cadastradas'}
-            </span>
-            <span className="text-[11px] text-slate-400">
-              Saldo total pendente a quitar: <strong className="text-amber-400">{hideBalance ? '••••••' : formatCurrency(totalDebtsRemaining)}</strong>
-            </span>
+          <h3 className="text-base font-semibold text-slate-100 mb-1">Comece pelo primeiro lançamento</h3>
+          <p className="text-sm text-slate-400 mb-5 max-w-sm mx-auto">
+            Registre um gasto ou um ganho. Dá para parcelar compras e cadastrar dívidas também.
+          </p>
+          <div className="flex items-center justify-center gap-2 flex-wrap">
+            <button
+              onClick={() => handleOpenNewTransaction('expense')}
+              className="text-sm font-semibold text-slate-950 bg-slate-100 hover:bg-white px-4 min-h-[42px] rounded-full cursor-pointer"
+            >
+              Registrar gasto
+            </button>
+            <button
+              onClick={() => handleOpenNewTransaction('income')}
+              className="text-sm font-semibold text-slate-100 bg-slate-800 hover:bg-slate-700 px-4 min-h-[42px] rounded-full cursor-pointer"
+            >
+              Registrar ganho
+            </button>
+            <button
+              onClick={handleOpenNewDebt}
+              className="text-sm font-semibold text-slate-100 bg-slate-800 hover:bg-slate-700 px-4 min-h-[42px] rounded-full cursor-pointer"
+            >
+              Cadastrar dívida
+            </button>
           </div>
         </div>
+      )}
+
+      <TransactionList
+        transactions={monthTransactions}
+        categories={categories}
+        hideBalance={hideBalance}
+        onEditTransaction={handleEditTransaction}
+        onDeleteTransaction={handleDeleteTransaction}
+        onToggleStatus={handleToggleTxStatus}
+        onOpenExportModal={openExport}
+        onOpenNewTransaction={() => handleOpenNewTransaction('expense')}
+        onClearAllTransactions={handleClearAccountTransactions}
+        searchQuery={searchQuery}
+        onSearchQueryChange={setSearchQuery}
+      />
+
+      {activeDebts.length > 0 && (
         <button
+          type="button"
           onClick={() => goToTab('debts')}
-          className="text-xs font-bold text-amber-300 hover:text-white bg-amber-950/50 hover:bg-amber-900/60 border border-amber-800/50 px-3.5 py-1.5 rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer self-start sm:self-auto active:scale-95"
+          className="w-full bg-slate-900 hover:bg-slate-800/80 rounded-3xl px-4 sm:px-5 min-h-[64px] flex items-center gap-3 text-left cursor-pointer transition-colors"
         >
-          <span>Ver Dívidas & Abater</span>
-          <ArrowRight size={13} />
+          <span className="w-10 h-10 rounded-2xl bg-slate-800 text-amber-300 flex items-center justify-center shrink-0">
+            <Building2 size={18} />
+          </span>
+          <span className="flex-1 min-w-0">
+            <span className="block text-[15px] font-medium text-slate-100">
+              {activeDebts.length} {activeDebts.length === 1 ? 'dívida ativa' : 'dívidas ativas'}
+            </span>
+            <span className="block text-[13px] text-slate-400 tabular-nums">
+              Faltam {hideBalance ? '••••••' : formatCurrency(totalDebtsRemaining)} para quitar
+            </span>
+          </span>
+          <ArrowRight size={16} className="text-slate-500" />
         </button>
-      </div>
-    )}
+      )}
 
-    {/* Empty state hint */}
-    {hasNoData && (
-      <div className="bg-[#11141D] rounded-3xl p-6 border border-slate-800 text-center mb-5">
-        <div className="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-emerald-500/20">
-          <Sparkles size={22} />
-        </div>
-        <h3 className="text-sm font-bold text-white mb-1">
-          Seu gerenciador financeiro está pronto
-        </h3>
-        <p className="text-xs text-slate-400 mb-4 max-w-sm mx-auto">
-          Sem complicação para qualquer idade. Adicione sua primeira despesa (com opção de parcelar) ou dívida para começar seu controle.
-        </p>
-        <div className="flex items-center justify-center gap-2.5 flex-wrap">
-          <button
-            onClick={() => handleOpenNewTransaction('income')}
-            className="text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-xl transition-all shadow-md shadow-emerald-950/40 cursor-pointer"
-          >
-            + Registrar Receita
-          </button>
-          <button
-            onClick={() => handleOpenNewTransaction('expense')}
-            className="text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 px-4 py-2 rounded-xl transition-all shadow-md shadow-rose-950/40 cursor-pointer"
-          >
-            + Registrar Despesa (ou Parcelada)
-          </button>
-          <button
-            onClick={handleOpenNewDebt}
-            className="text-xs font-bold text-white bg-amber-600 hover:bg-amber-500 px-4 py-2 rounded-xl transition-all shadow-md shadow-amber-950/40 cursor-pointer"
-          >
-            + Registrar Dívida
-          </button>
-        </div>
-      </div>
-    )}
+      <FinancialEducationCard
+        monthIncome={monthIncome}
+        monthExpense={monthExpense}
+        monthTransactions={monthTransactions}
+        hideBalance={hideBalance}
+        onOpenInvestments={() => goToTab('investments')}
+      />
 
-    {/* Smart Transaction List */}
-    <TransactionList
-      transactions={monthTransactions}
-      categories={categories}
-      hideBalance={hideBalance}
-      onEditTransaction={handleEditTransaction}
-      onDeleteTransaction={handleDeleteTransaction}
-      onToggleStatus={handleToggleTxStatus}
-      onOpenExportModal={openExport}
-      onOpenNewTransaction={() => handleOpenNewTransaction('expense')}
-      onClearAllTransactions={handleClearAccountTransactions}
-      searchQuery={searchQuery}
-      onSearchQueryChange={setSearchQuery}
-    />
+      {footer}
     </div>
   );
 };

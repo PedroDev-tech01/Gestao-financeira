@@ -160,13 +160,13 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-t-3xl sm:rounded-3xl max-w-lg w-full shadow-2xl border-t sm:border border-slate-800/90 overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[92vh]">
+      <div className="bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-lg w-full border-t sm: overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[92vh]">
         
         {/* Mobile pull indicator */}
         <div className="w-10 h-1 bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-800/80 bg-[#0A0D14]/80">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-800/80 bg-[#15171C]/80">
           <div>
             <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
               <TrendingUp size={18} className="text-emerald-400" />
@@ -190,7 +190,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
           
           {/* Categoria / Tipo de Ativo */}
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
+            <label className="text-xs font-bold  text-slate-300 block mb-1.5">
               Classe do Investimento
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -205,7 +205,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
                     className={`p-2.5 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
                       isSelected
                         ? 'bg-emerald-950/40 border-emerald-500/60 shadow-xs'
-                        : 'bg-[#0A0D14] border-slate-800/80 hover:border-slate-700 opacity-80'
+                        : 'bg-[#15171C] border-slate-800/80 hover:border-slate-700 opacity-80'
                     }`}
                   >
                     <Icon size={16} className={isSelected ? 'text-emerald-400' : 'text-slate-400'} />
@@ -217,15 +217,15 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
               })}
             </div>
             {selectedCategoryConfig && (
-              <p className="text-[11px] text-slate-400 mt-2 bg-[#0A0D14] p-2.5 rounded-xl border border-slate-800/60 leading-relaxed">
-                💡 <span className="font-semibold text-slate-300">{selectedCategoryConfig.label}:</span> {selectedCategoryConfig.desc}
+              <p className="text-[11px] text-slate-400 mt-2 bg-[#15171C] p-2.5 rounded-xl border border-slate-800/60 leading-relaxed">
+                <span className="font-semibold text-slate-300">{selectedCategoryConfig.label}:</span> {selectedCategoryConfig.desc}
               </p>
             )}
           </div>
 
           {/* Nome do Investimento */}
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
+            <label className="text-xs font-bold  text-slate-300 block mb-1.5">
               Nome da Aplicação / Ativo
             </label>
             <input
@@ -234,14 +234,14 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
               placeholder="Ex: CDB 100% CDI Liquidez Diária, Tesouro Selic 2029, FII MXRF11"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-[#0A0D14] border border-slate-800 rounded-xl text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-all"
+              className="w-full px-4 py-2.5 text-sm bg-[#15171C] border border-slate-800 rounded-xl text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-all"
               autoFocus
             />
           </div>
 
           {/* Banco / Corretora / Instituição */}
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
+            <label className="text-xs font-bold  text-slate-300 block mb-1.5">
               Banco, Corretora ou Instituição <span className="text-slate-500 font-normal">(opcional)</span>
             </label>
             <input
@@ -249,7 +249,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
               placeholder="Ex: Nubank, Banco Inter, XP Investimentos, BTG, Itaú, Binance"
               value={institution}
               onChange={(e) => setInstitution(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm bg-[#0A0D14] border border-slate-800 rounded-xl text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-all"
+              className="w-full px-4 py-2.5 text-sm bg-[#15171C] border border-slate-800 rounded-xl text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-all"
             />
           </div>
 
@@ -257,7 +257,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {/* Valor Aportado */}
             <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
+              <label className="text-xs font-bold  text-slate-300 block mb-1.5">
                 Total Aportado (Do Bolso)
               </label>
               <div className="relative">
@@ -272,7 +272,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
                   placeholder="0,00"
                   value={investedAmount}
                   onChange={(e) => setInvestedAmount(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2.5 text-sm font-bold bg-[#0A0D14] border border-slate-800 rounded-xl text-slate-100 focus:outline-none focus:border-emerald-500/60 transition-all placeholder:text-slate-600"
+                  className="w-full pl-10 pr-3 py-2.5 text-sm font-bold bg-[#15171C] border border-slate-800 rounded-xl text-slate-100 focus:outline-none focus:border-emerald-500/60 transition-all placeholder:text-slate-600"
                 />
               </div>
               <span className="text-[10px] text-slate-500 mt-1 block">
@@ -282,7 +282,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
 
             {/* Saldo Atual com Rendimentos */}
             <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
+              <label className="text-xs font-bold  text-slate-300 block mb-1.5">
                 Saldo Hoje (Com Lucro)
               </label>
               <div className="relative">
@@ -296,7 +296,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
                   placeholder="0,00 (igual ao aportado se novo)"
                   value={currentValue}
                   onChange={(e) => setCurrentValue(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2.5 text-sm font-bold bg-[#0A0D14] border border-slate-800 rounded-xl text-emerald-300 focus:outline-none focus:border-emerald-500/60 transition-all placeholder:text-slate-600"
+                  className="w-full pl-10 pr-3 py-2.5 text-sm font-bold bg-[#15171C] border border-slate-800 rounded-xl text-emerald-300 focus:outline-none focus:border-emerald-500/60 transition-all placeholder:text-slate-600"
                 />
               </div>
               <span className="text-[10px] text-slate-500 mt-1 block">
@@ -309,7 +309,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             {/* Meta de Valor (Goal) */}
             <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
+              <label className="text-xs font-bold  text-slate-300 block mb-1.5">
                 Meta do Objetivo <span className="text-slate-500 font-normal">(opcional)</span>
               </label>
               <div className="relative">
@@ -323,7 +323,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
                   placeholder="Ex: 15.000,00"
                   value={targetAmount}
                   onChange={(e) => setTargetAmount(e.target.value)}
-                  className="w-full pl-10 pr-3 py-2 text-sm bg-[#0A0D14] border border-slate-800 rounded-xl text-teal-300 focus:outline-none focus:border-teal-500/60 transition-all"
+                  className="w-full pl-10 pr-3 py-2 text-sm bg-[#15171C] border border-slate-800 rounded-xl text-teal-300 focus:outline-none focus:border-teal-500/60 transition-all"
                 />
               </div>
               <span className="text-[10px] text-slate-500 mt-1 block">
@@ -333,7 +333,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
 
             {/* Taxa de Rendimento Contratada */}
             <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
+              <label className="text-xs font-bold  text-slate-300 block mb-1.5">
                 Taxa Contratada <span className="text-slate-500 font-normal">(opcional)</span>
               </label>
               <input
@@ -341,7 +341,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
                 placeholder="Ex: 100% do CDI, IPCA + 6%, 12% a.a."
                 value={yieldRate}
                 onChange={(e) => setYieldRate(e.target.value)}
-                className="w-full px-3.5 py-2 text-sm bg-[#0A0D14] border border-slate-800 rounded-xl text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60"
+                className="w-full px-3.5 py-2 text-sm bg-[#15171C] border border-slate-800 rounded-xl text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60"
               />
               <span className="text-[10px] text-slate-500 mt-1 block">
                 Para seu controle de rentabilidade.
@@ -351,7 +351,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
 
           {/* Observações */}
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1">
+            <label className="text-xs font-bold  text-slate-300 block mb-1">
               Observações ou Detalhes <span className="text-slate-500 font-normal">(opcional)</span>
             </label>
             <textarea
@@ -359,7 +359,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
               placeholder="Ex: Resgate imediato pelo app; carência até 2026; reinvestir dividendos mensais."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-4 py-2 text-xs bg-[#0A0D14] border border-slate-800 rounded-xl text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60 resize-none"
+              className="w-full px-4 py-2 text-xs bg-[#15171C] border border-slate-800 rounded-xl text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60 resize-none"
             />
           </div>
 
@@ -367,7 +367,7 @@ export const InvestmentModal: React.FC<InvestmentModalProps> = ({
           <div className="pt-2">
             <button
               type="submit"
-              className="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-[#0A0D14] bg-emerald-400 hover:bg-emerald-300 shadow-lg shadow-emerald-950/50 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+              className="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-[#15171C] bg-emerald-400 hover:bg-emerald-300 shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
             >
               <Check size={18} />
               <span>{editingInvestment ? 'Salvar Alterações' : 'Cadastrar Investimento'}</span>

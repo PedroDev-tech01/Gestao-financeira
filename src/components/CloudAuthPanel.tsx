@@ -37,8 +37,8 @@ interface CloudAuthPanelProps {
 }
 
 const inputClass =
-  'w-full pl-10 pr-4 py-2.5 bg-[#0A0C10] border border-slate-800 rounded-xl text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60 transition-colors';
-const labelClass = 'block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5';
+  'w-full pl-10 pr-4 py-2.5 bg-[#15171C] border border-slate-800 rounded-xl text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60 transition-colors';
+const labelClass = 'block text-[13px] font-medium text-slate-400 mb-1.5';
 
 export const CloudAuthPanel: React.FC<CloudAuthPanelProps> = ({
   onAuthenticated,
@@ -163,7 +163,7 @@ export const CloudAuthPanel: React.FC<CloudAuthPanelProps> = ({
             type="button"
             onClick={handleGoogle}
             disabled={disabled}
-            className="w-full py-3 px-4 bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm rounded-2xl shadow-lg transition-all flex items-center justify-center gap-3 cursor-pointer active:scale-[0.99] disabled:opacity-75 disabled:cursor-not-allowed border border-slate-200"
+            className="w-full py-3 px-4 bg-white hover:bg-slate-100 text-slate-900 font-bold text-sm rounded-2xl transition-all flex items-center justify-center gap-3 cursor-pointer active:scale-[0.99] disabled:opacity-75 disabled:cursor-not-allowed border border-slate-200"
           >
             {loading === 'google' ? (
               <Loader2 size={18} className="animate-spin text-emerald-600" />
@@ -176,7 +176,7 @@ export const CloudAuthPanel: React.FC<CloudAuthPanelProps> = ({
               </svg>
             )}
             <div className="flex flex-col items-start text-left leading-tight">
-              <span className="font-extrabold text-xs sm:text-sm">
+              <span className="font-semibold text-xs sm:text-sm">
                 {loading === 'google' ? 'Conectando...' : 'Continuar com a Conta Google'}
               </span>
               <span className="text-[10px] text-slate-500 font-medium flex items-center gap-1">
@@ -188,7 +188,7 @@ export const CloudAuthPanel: React.FC<CloudAuthPanelProps> = ({
 
           <div className="relative flex items-center justify-center my-5">
             <div className="border-t border-slate-800 w-full" />
-            <span className="bg-[#11141D] px-3 text-[11px] font-medium text-slate-500 uppercase tracking-wider shrink-0">
+            <span className="bg-[#1E2128] px-3 text-[11px] font-medium text-slate-500  shrink-0">
               ou com e-mail
             </span>
             <div className="border-t border-slate-800 w-full" />
@@ -238,7 +238,7 @@ export const CloudAuthPanel: React.FC<CloudAuthPanelProps> = ({
         {mode !== 'reset' && (
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400">Senha</label>
+              <label className="block text-[11px] font-bold  text-slate-400">Senha</label>
               {mode === 'login' && (
                 <button
                   type="button"
@@ -296,7 +296,7 @@ export const CloudAuthPanel: React.FC<CloudAuthPanelProps> = ({
           id="btn-submit-email-auth"
           type="submit"
           disabled={disabled}
-          className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 font-bold text-sm text-white rounded-xl shadow-lg shadow-emerald-950/50 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-75 disabled:cursor-not-allowed"
+          className="w-full py-3 px-4 bg-slate-100 hover:bg-white font-bold text-sm text-slate-950 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99] disabled:opacity-75 disabled:cursor-not-allowed"
         >
           {loading === 'email' && <Loader2 size={16} className="animate-spin" />}
           <span>

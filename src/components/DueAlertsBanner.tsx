@@ -1,16 +1,7 @@
 import React, { useState } from 'react';
-import {
-  Bell,
-  AlertTriangle,
-  Clock,
-  ChevronRight,
-  X,
-  DollarSign,
-  Calendar,
-  CheckCircle2
-} from 'lucide-react';
+import { ChevronRight, X } from 'lucide-react';
 import { DueReminder } from '../services/notificationService';
-import { formatCurrency, formatDateBR, formatDaysRemainingLabel } from '../utils/formatters';
+import { formatCurrency, formatDaysRemainingLabel } from '../utils/formatters';
 import { DebtItem } from '../types';
 
 interface DueAlertsBannerProps {
@@ -21,6 +12,10 @@ interface DueAlertsBannerProps {
   hideBalance?: boolean;
 }
 
+/**
+ * Contas vencendo: um cartão discreto com as 2 mais urgentes e um botão para pagar/baixar.
+ * A cor só aparece no pontinho e no prazo, para o aviso chamar atenção sem gritar.
+ */
 export const DueAlertsBanner: React.FC<DueAlertsBannerProps> = ({
   reminders,
   onOpenNotificationCenter,
@@ -29,138 +24,79 @@ export const DueAlertsBanner: React.FC<DueAlertsBannerProps> = ({
   hideBalance = false,
 }) => {
   const [isDismissed, setIsDismissed] = useState(false);
-
   if (isDismissed || reminders.length === 0) return null;
 
   const overdueCount = reminders.filter((r) => r.urgency === 'overdue').length;
   const todayCount = reminders.filter((r) => r.urgency === 'today').length;
-  const hasCritical = overdueCount > 0 || todayCount > 0;
-
   const totalAmount = reminders.reduce((sum, r) => sum + r.amount, 0);
   const featured = reminders.slice(0, 2);
 
+  const dotColor = overdueCount > 0 ? 'bg-rose-400' : todayCount > 0 ? 'bg-amber-300' : 'bg-slate-400';
+  const upcoming = reminders.length - overdueCount;
+  const title =
+    overdueCount > 0
+      ? `${overdueCount} ${overdueCount === 1 ? 'conta atrasada' : 'contas atrasadas'}${upcoming > 0 ? ` e ${upcoming} vencendo` : ''}`
+      : todayCount > 0
+        ? `${todayCount} ${todayCount === 1 ? 'conta vence' : 'contas vencem'} hoje`
+        : `${reminders.length} ${reminders.length === 1 ? 'conta vence' : 'contas vencem'} esta semana`;
+
   return (
-    <div
-      className={`mb-5 rounded-2xl border transition-all duration-300 shadow-md relative overflow-hidden ${
-        overdueCount > 0
-          ? 'bg-gradient-to-r from-rose-950/50 via-[#14121A] to-[#0E131F] border-rose-800/60'
-          : todayCount > 0
-          ? 'bg-gradient-to-r from-amber-950/50 via-[#141824] to-[#0E131F] border-amber-800/60'
-          : 'bg-gradient-to-r from-[#141B29] to-[#0E131F] border-sky-800/50'
-      }`}
-    >
-      {/* Top Banner Status Bar */}
-      <div className="p-3.5 sm:p-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 min-w-0">
-          <div
-            className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border ${
-              overdueCount > 0
-                ? 'bg-rose-500/10 border-rose-500/30 text-rose-400'
-                : todayCount > 0
-                ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
-                : 'bg-sky-500/10 border-sky-500/30 text-sky-400'
-            }`}
-          >
-            {overdueCount > 0 ? (
-              <AlertTriangle size={18} />
-            ) : todayCount > 0 ? (
-              <Clock size={18} />
-            ) : (
-              <Bell size={18} />
-            )}
-          </div>
-
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-xs font-black text-slate-100">
-                {overdueCount > 0
-                  ? `Atenção: ${overdueCount} conta(s) em atraso!`
-                  : todayCount > 0
-                  ? `Lembrete: ${todayCount} conta(s) vencem hoje!`
-                  : `Contas a vencer nos próximos dias (${reminders.length})`}
-              </span>
-              <span className="text-[11px] text-slate-400 font-medium">
-                Total: <strong className="text-slate-100">{hideBalance ? '••••••' : formatCurrency(totalAmount)}</strong>
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-400 mt-0.5 truncate hidden sm:block">
-              Evite juros e multas mantendo seus pagamentos em dia.
-            </p>
-          </div>
+    <section aria-label="Contas vencendo" className="bg-slate-900 rounded-3xl p-4 sm:p-5">
+      <div className="flex items-center gap-2.5">
+        <span className={`w-2 h-2 rounded-full shrink-0 ${dotColor}`} aria-hidden="true" />
+        <div className="flex-1 min-w-0">
+          <h2 className="text-[15px] font-semibold text-slate-100">{title}</h2>
+          <p className="text-[13px] text-slate-400 tabular-nums">
+            {hideBalance ? '••••••' : formatCurrency(totalAmount)} no total
+          </p>
         </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          <button
-            onClick={onOpenNotificationCenter}
-            className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 shadow-xs ${
-              overdueCount > 0
-                ? 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-950/50'
-                : todayCount > 0
-                ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-amber-950/50'
-                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700'
-            }`}
-          >
-            <span>Ver Contas ({reminders.length})</span>
-            <ChevronRight size={13} />
-          </button>
-
-          <button
-            onClick={() => setIsDismissed(true)}
-            className="p-1.5 text-slate-400 hover:text-white rounded-lg transition-colors cursor-pointer"
-            title="Ocultar aviso temporariamente"
-          >
-            <X size={15} />
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setIsDismissed(true)}
+          className="w-9 h-9 -mr-1.5 flex items-center justify-center text-slate-500 hover:text-slate-200 rounded-full cursor-pointer"
+          aria-label="Ocultar aviso por enquanto"
+        >
+          <X size={16} />
+        </button>
       </div>
 
-      {/* Mini Cards of Immediate Pending Due Items */}
-      <div className="px-3.5 sm:px-4 pb-3.5 pt-0 grid grid-cols-1 sm:grid-cols-2 gap-2">
+      <ul className="mt-2">
         {featured.map((item) => {
-          const labelInfo = formatDaysRemainingLabel(item.daysDiff);
-          const isDebt = item.sourceType === 'debt';
-
+          const label = formatDaysRemainingLabel(item.daysDiff);
+          const isDebt = item.sourceType === 'debt' && item.rawDebt;
           return (
-            <div
-              key={item.id}
-              className="p-2.5 rounded-xl bg-[#0A0D14]/70 border border-slate-800/80 flex items-center justify-between gap-2.5 text-xs"
-            >
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded border ${labelInfo.bg} ${labelInfo.color}`}>
-                    {labelInfo.text}
-                  </span>
-                  <span className="text-[10px] text-slate-500 truncate">
-                    {item.dueDate ? formatDateBR(item.dueDate) : ''}
-                  </span>
-                </div>
-                <div className="font-bold text-slate-200 truncate">{item.title}</div>
+            <li key={item.id} className="flex items-center gap-3 min-h-[52px]">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-slate-100 truncate">{item.title}</p>
+                <p className={`text-xs mt-0.5 ${item.daysDiff < 0 ? 'text-rose-400' : item.daysDiff === 0 ? 'text-amber-300' : 'text-slate-400'}`}>
+                  {label.text}
+                </p>
               </div>
-
-              <div className="flex items-center gap-2 shrink-0">
-                <span className="font-black text-slate-100">
-                  {hideBalance ? '••••••' : formatCurrency(item.amount)}
-                </span>
-                {isDebt && item.rawDebt ? (
-                  <button
-                    onClick={() => onPayDebt(item.rawDebt!)}
-                    className="px-2 py-1 bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold text-[10px] rounded-lg transition-all active:scale-95 cursor-pointer"
-                  >
-                    Pagar
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => onMarkExpensePaid(item.sourceId)}
-                    className="px-2 py-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] rounded-lg transition-all active:scale-95 cursor-pointer"
-                  >
-                    Baixar
-                  </button>
-                )}
-              </div>
-            </div>
+              <span className="text-sm text-slate-100 tabular-nums">
+                {hideBalance ? '••••••' : formatCurrency(item.amount)}
+              </span>
+              <button
+                type="button"
+                onClick={() => (isDebt ? onPayDebt(item.rawDebt!) : onMarkExpensePaid(item.sourceId))}
+                className="px-3 min-h-[34px] rounded-full bg-slate-800 hover:bg-slate-700 text-slate-100 text-xs font-semibold cursor-pointer active:scale-95"
+              >
+                {isDebt ? 'Pagar' : 'Paguei'}
+              </button>
+            </li>
           );
         })}
-      </div>
-    </div>
+      </ul>
+
+      {reminders.length > featured.length && (
+        <button
+          type="button"
+          onClick={onOpenNotificationCenter}
+          className="mt-1 w-full flex items-center justify-between min-h-[40px] text-[13px] text-slate-400 hover:text-slate-200 cursor-pointer"
+        >
+          <span>Ver todas as {reminders.length} contas</span>
+          <ChevronRight size={15} />
+        </button>
+      )}
+    </section>
   );
 };

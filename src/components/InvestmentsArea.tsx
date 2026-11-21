@@ -155,25 +155,24 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
         
         {/* Card 1: Patrimônio Total Investido */}
-        <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-emerald-900/40 hover:border-emerald-500/40 hover:-translate-y-0.5 transition-all duration-200 shadow-md relative overflow-hidden flex flex-col justify-between">
-          <div className="absolute top-0 right-0 w-36 h-36 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none -mr-10 -mt-10" />
+        <div className="bg-slate-900 rounded-2xl sm:rounded-3xl p-4 sm:p-5 transition-all duration-200 relative overflow-hidden flex flex-col justify-between">
 
           <div>
             <div className="flex items-center justify-between mb-2.5 relative z-10">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-xs shadow-emerald-400/50" />
+              <span className="text-xs font-bold  text-slate-300 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-xs" />
                 Patrimônio Acumulado
               </span>
               <button
                 onClick={onOpenNewInvestment}
-                className="text-xs font-bold text-emerald-300 hover:text-white bg-emerald-950/60 hover:bg-emerald-900/70 border border-emerald-800/60 px-2.5 py-1 rounded-xl flex items-center gap-1 transition-all cursor-pointer active:scale-95"
+                className="text-xs font-bold text-emerald-300 hover:text-white bg-emerald-950/60 hover:bg-emerald-900/70 border border-emerald-800/60 px-2.5 py-1 rounded-full flex items-center gap-1 transition-all cursor-pointer active:scale-95"
               >
                 <Plus size={13} />
                 <span>Aplicar</span>
               </button>
             </div>
 
-            <div className="text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight relative z-10 truncate">
+            <div className="text-2xl sm:text-3xl font-semibold text-emerald-400 tracking-tight relative z-10 truncate">
               {hideBalance ? '••••••' : formatCurrency(totalCurrentValue)}
             </div>
           </div>
@@ -192,19 +191,18 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
         </div>
 
         {/* Card 2: Total Aportado (Do Bolso) */}
-        <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-800/80 hover:border-blue-500/40 hover:-translate-y-0.5 transition-all duration-200 shadow-md relative overflow-hidden flex flex-col justify-between">
-          <div className="absolute top-0 right-0 w-36 h-36 bg-blue-500/10 rounded-full blur-3xl pointer-events-none -mr-10 -mt-10" />
+        <div className="bg-slate-900 rounded-2xl sm:rounded-3xl p-4 sm:p-5 hover:border-blue-500/40 hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden flex flex-col justify-between">
 
           <div>
             <div className="flex items-center justify-between mb-2.5 relative z-10">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-blue-400 shadow-xs shadow-blue-400/50" />
+              <span className="text-xs font-bold  text-slate-300 flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-blue-400 shadow-xs" />
                 Total Aportado
               </span>
               <span className="text-[10px] text-slate-500">Capital Próprio</span>
             </div>
 
-            <div className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight relative z-10 truncate">
+            <div className="text-2xl sm:text-3xl font-semibold text-slate-100 tracking-tight relative z-10 truncate">
               {hideBalance ? '••••••' : formatCurrency(totalInvestedAmount)}
             </div>
           </div>
@@ -216,12 +214,11 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
         </div>
 
         {/* Card 3: Reserva de Emergência */}
-        <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-800/80 hover:border-teal-500/40 hover:-translate-y-0.5 transition-all duration-200 shadow-md relative overflow-hidden flex flex-col justify-between">
-          <div className="absolute top-0 right-0 w-36 h-36 bg-teal-500/10 rounded-full blur-3xl pointer-events-none -mr-10 -mt-10" />
+        <div className="bg-slate-900 rounded-2xl sm:rounded-3xl p-4 sm:p-5 hover:border-teal-500/40 hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden flex flex-col justify-between">
 
           <div>
             <div className="flex items-center justify-between mb-2.5 relative z-10">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+              <span className="text-xs font-bold  text-slate-300 flex items-center gap-2">
                 <Shield size={14} className="text-teal-400" />
                 Reserva de Emergência
               </span>
@@ -230,7 +227,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
               </span>
             </div>
 
-            <div className="text-2xl sm:text-3xl font-black text-teal-400 tracking-tight relative z-10 truncate">
+            <div className="text-2xl sm:text-3xl font-semibold text-teal-400 tracking-tight relative z-10 truncate">
               {hideBalance ? '••••••' : formatCurrency(totalEmergency)}
             </div>
           </div>
@@ -242,7 +239,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
                   <span>Progresso da meta:</span>
                   <span className="font-bold text-teal-300">{emergencyProgress}% de {formatCurrency(totalEmergencyTarget)}</span>
                 </div>
-                <div className="w-full bg-[#0A0D14] h-1.5 rounded-full overflow-hidden border border-slate-800">
+                <div className="w-full bg-[#15171C] h-1.5 rounded-full overflow-hidden border border-slate-800">
                   <div 
                     className="h-full bg-teal-500 rounded-full transition-all duration-500" 
                     style={{ width: `${emergencyProgress}%` }}
@@ -262,9 +259,9 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
 
       {/* 2. ALOCAÇÃO DO PATRIMÔNIO (DISTRIBUIÇÃO POR CLASSE) */}
       {totalCurrentValue > 0 && categoryAllocation.length > 0 && (
-        <div className="bg-gradient-to-r from-[#131A29] to-[#0E131F] rounded-2xl p-4 sm:p-5 border border-slate-800/80 shadow-xs space-y-3">
+        <div className="bg-slate-900 rounded-2xl p-4 sm:p-5 space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+            <span className="text-xs font-bold  text-slate-300 flex items-center gap-1.5">
               <Percent size={14} className="text-emerald-400" />
               <span>Distribuição do seu Dinheiro Investido</span>
             </span>
@@ -274,7 +271,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
           </div>
 
           {/* Segmented bar */}
-          <div className="w-full bg-[#0A0D14] h-3 rounded-full overflow-hidden flex border border-slate-800 p-0.5 gap-0.5">
+          <div className="w-full bg-[#15171C] h-3 rounded-full overflow-hidden flex border border-slate-800 p-0.5 gap-0.5">
             {categoryAllocation.map(alloc => (
               <div
                 key={alloc.key}
@@ -314,10 +311,10 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
       )}
 
       {/* 3. DIDACTIC INVESTOR GUIDANCE BANNER */}
-      <div className="bg-gradient-to-r from-[#131A29] to-[#0E131F] rounded-2xl p-4 border border-slate-800/80 shadow-xs">
+      <div className="bg-slate-900 rounded-2xl p-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center shrink-0 mt-0.5">
+            <div className="w-9 h-9 rounded-xl bg-slate-800 text-teal-300 flex items-center justify-center shrink-0 mt-0.5">
               <PiggyBank size={18} />
             </div>
             <div>
@@ -334,7 +331,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
           </div>
           <button
             onClick={() => setShowGuide(!showGuide)}
-            className="ml-12 sm:ml-0 text-xs font-semibold text-slate-300 hover:text-white bg-[#0A0D14] hover:bg-slate-800 border border-slate-800 px-3 py-1.5 rounded-xl transition-all cursor-pointer shrink-0 self-start sm:self-auto active:scale-95 whitespace-nowrap"
+            className="ml-12 sm:ml-0 text-xs font-semibold text-slate-300 hover:text-white bg-[#15171C] hover:bg-slate-800 border border-slate-800 px-3 py-1.5 rounded-full transition-all cursor-pointer shrink-0 self-start sm:self-auto active:scale-95 whitespace-nowrap"
           >
             {showGuide ? 'Ocultar Dicas' : 'Ver Guia Completo'}
           </button>
@@ -342,21 +339,21 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
 
         {showGuide && (
           <div className="mt-4 pt-4 border-t border-slate-800/80 grid grid-cols-1 md:grid-cols-3 gap-3 animate-in fade-in duration-200">
-            <div className="p-3 bg-[#0A0D14] rounded-xl border border-slate-800">
+            <div className="p-3 bg-[#15171C] rounded-xl border border-slate-800">
               <span className="text-xs font-bold text-emerald-400 block mb-1">1. Passo Fundamental</span>
               <p className="text-[11px] text-slate-300 leading-relaxed">
                 <strong>Reserva de Emergência:</strong> Dinheiro de socorro para problemas mecânicos, saúde ou transição de trabalho. Deve estar em bancos sólidos e com resgate no mesmo dia.
               </p>
             </div>
 
-            <div className="p-3 bg-[#0A0D14] rounded-xl border border-slate-800">
+            <div className="p-3 bg-[#15171C] rounded-xl border border-slate-800">
               <span className="text-xs font-bold text-blue-400 block mb-1">2. Renda Fixa & Metas</span>
               <p className="text-[11px] text-slate-300 leading-relaxed">
                 <strong>Previsibilidade:</strong> CDBs de médio prazo, LCI/LCA (sem imposto de renda) e Tesouro IPCA para proteger seu dinheiro da inflação em compras futuras.
               </p>
             </div>
 
-            <div className="p-3 bg-[#0A0D14] rounded-xl border border-slate-800">
+            <div className="p-3 bg-[#15171C] rounded-xl border border-slate-800">
               <span className="text-xs font-bold text-purple-400 block mb-1">3. Longo Prazo</span>
               <p className="text-[11px] text-slate-300 leading-relaxed">
                 <strong>Renda Variável & Dividendos:</strong> Fundos imobiliários que pagam aluguéis mensais isentos e ações de empresas sólidas com paciência para multiplicar patrimônio.
@@ -378,7 +375,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
           {onClearSearch && (
             <button
               onClick={onClearSearch}
-              className="text-xs text-blue-300 hover:text-white px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer shrink-0"
+              className="text-xs text-blue-300 hover:text-white px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-full transition-colors cursor-pointer shrink-0"
             >
               Limpar busca
             </button>
@@ -388,62 +385,62 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
 
       {/* 4. ACTIONS & CATEGORY FILTER TABS */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
-        <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-[#0A0D14] rounded-2xl border border-slate-800/80 shadow-xs w-full sm:w-auto">
+        <div className="flex flex-wrap items-center gap-1.5 p-1.5 bg-[#15171C] rounded-2xl w-full sm:w-auto">
           <button
             onClick={() => setFilter('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+            className={`shrink-0 px-3.5 min-h-[36px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               filter === 'all'
-                ? 'bg-slate-800 text-white shadow-xs border border-slate-700/60'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-slate-100 text-slate-950'
+                : 'bg-slate-900 text-slate-400 hover:text-slate-200'
             }`}
           >
             Todos ({investments.length})
           </button>
           <button
             onClick={() => setFilter('emergency_fund')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+            className={`shrink-0 px-3.5 min-h-[36px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               filter === 'emergency_fund'
-                ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/60 shadow-xs'
-                : 'text-slate-400 hover:text-emerald-300'
+                ? 'bg-slate-100 text-slate-950'
+                : 'bg-slate-900 text-slate-400 hover:text-slate-200'
             }`}
           >
-            🛡️ Reserva ({emergencyFunds.length})
+            Reserva ({emergencyFunds.length})
           </button>
           <button
             onClick={() => setFilter('fixed_income')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+            className={`shrink-0 px-3.5 min-h-[36px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               filter === 'fixed_income'
-                ? 'bg-blue-950/60 text-blue-300 border border-blue-800/60 shadow-xs'
-                : 'text-slate-400 hover:text-blue-300'
+                ? 'bg-slate-100 text-slate-950'
+                : 'bg-slate-900 text-slate-400 hover:text-slate-200'
             }`}
           >
-            🔒 Renda Fixa
+            Renda Fixa
           </button>
           <button
             onClick={() => setFilter('variable_income')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+            className={`shrink-0 px-3.5 min-h-[36px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               filter === 'variable_income'
-                ? 'bg-purple-950/60 text-purple-300 border border-purple-800/60 shadow-xs'
-                : 'text-slate-400 hover:text-purple-300'
+                ? 'bg-slate-100 text-slate-950'
+                : 'bg-slate-900 text-slate-400 hover:text-slate-200'
             }`}
           >
-            📈 Renda Variável
+            Renda Variável
           </button>
           <button
             onClick={() => setFilter('crypto')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer active:scale-95 ${
+            className={`shrink-0 px-3.5 min-h-[36px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               filter === 'crypto'
-                ? 'bg-orange-950/60 text-orange-300 border border-orange-800/60 shadow-xs'
-                : 'text-slate-400 hover:text-orange-300'
+                ? 'bg-slate-100 text-slate-950'
+                : 'bg-slate-900 text-slate-400 hover:text-slate-200'
             }`}
           >
-            🪙 Cripto
+            Cripto
           </button>
         </div>
 
         <button
           onClick={onOpenNewInvestment}
-          className="text-xs font-bold text-[#0A0D14] bg-emerald-400 hover:bg-emerald-300 px-4 py-2 rounded-xl transition-all shadow-md shadow-emerald-950/40 flex items-center justify-center gap-1.5 cursor-pointer self-start sm:self-auto active:scale-95"
+          className="text-sm font-semibold text-slate-950 bg-slate-100 hover:bg-white px-4 min-h-[40px] rounded-full transition-all flex items-center justify-center gap-1.5 cursor-pointer self-start sm:self-auto active:scale-95"
         >
           <Plus size={15} />
           <span>Cadastrar Novo Investimento</span>
@@ -452,7 +449,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
 
       {/* 5. LIST OF INVESTMENTS */}
       {filteredInvestments.length === 0 ? (
-        <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-3xl p-8 border border-slate-800/80 text-center shadow-md">
+        <div className="bg-slate-900 rounded-3xl p-8 text-center">
           <div className="w-14 h-14 bg-emerald-500/10 text-emerald-400 rounded-2xl flex items-center justify-center mx-auto mb-3 border border-emerald-500/20">
             <PiggyBank size={26} />
           </div>
@@ -467,7 +464,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
           <div className="flex items-center justify-center gap-2.5 flex-wrap">
             <button
               onClick={onOpenNewInvestment}
-              className="text-xs font-bold text-[#0A0D14] bg-emerald-400 hover:bg-emerald-300 px-4 py-2.5 rounded-xl transition-all shadow-md cursor-pointer active:scale-95"
+              className="text-xs font-bold text-[#15171C] bg-emerald-400 hover:bg-emerald-300 px-4 py-2.5 rounded-full transition-all shadow-md cursor-pointer active:scale-95"
             >
               + Cadastrar Meu Primeiro Investimento
             </button>
@@ -489,7 +486,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
             return (
               <div
                 key={item.id}
-                className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-3xl p-5 border border-slate-800/80 hover:border-slate-700 transition-all duration-200 shadow-md flex flex-col justify-between group"
+                className="bg-slate-900 rounded-3xl p-5 hover:border-slate-700 transition-all duration-200 flex flex-col justify-between group"
               >
                 <div>
                   {/* Card Header: Category badge & Actions */}
@@ -539,18 +536,18 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
                   </div>
 
                   {/* Financial Values Box */}
-                  <div className="p-3.5 bg-[#0A0D14]/90 rounded-2xl border border-slate-800/80 mb-3">
+                  <div className="p-3.5 bg-[#15171C]/90 rounded-2xl mb-3">
                     <div className="flex items-baseline justify-between">
                       <div>
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5">
+                        <span className="text-xs font-medium text-slate-400 block mb-0.5">
                           Saldo Atual Aplicado
                         </span>
-                        <span className="text-xl font-black text-emerald-400">
+                        <span className="text-xl font-semibold text-emerald-400">
                           {hideBalance ? '••••••' : formatCurrency(item.currentValue)}
                         </span>
                       </div>
                       <div className="text-right">
-                        <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-0.5">
+                        <span className="text-xs font-medium text-slate-400 block mb-0.5">
                           Rendimento
                         </span>
                         {!hideBalance ? (
@@ -573,7 +570,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
 
                   {/* Target progress if specified */}
                   {progress !== null && item.targetAmount && (
-                    <div className="mb-3 p-2.5 bg-[#0A0D14]/50 rounded-xl border border-slate-800/60 text-xs">
+                    <div className="mb-3 p-2.5 bg-[#15171C]/50 rounded-xl border border-slate-800/60 text-xs">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-[11px] text-slate-400 flex items-center gap-1">
                           <Target size={12} className="text-teal-400" />
@@ -603,7 +600,7 @@ export const InvestmentsArea: React.FC<InvestmentsAreaProps> = ({
                 {/* Card Action Button: Add Aporte / Resgatar */}
                 <button
                   onClick={() => onOpenAporte(item)}
-                  className="w-full py-2.5 px-3.5 bg-[#0A0D14] hover:bg-emerald-950/40 text-slate-200 hover:text-emerald-300 border border-slate-800 hover:border-emerald-700/50 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+                  className="w-full py-2.5 px-3.5 bg-[#15171C] hover:bg-emerald-950/40 text-slate-200 hover:text-emerald-300 border border-slate-800 hover:border-emerald-700/50 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
                 >
                   <PlusCircle size={14} className="text-emerald-400" />
                   <span>Aportar ou Resgatar</span>

@@ -36,26 +36,26 @@ export class ErrorBoundary extends React.Component<Props, State> {
   public override render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#0A0C10] flex items-center justify-center p-4 text-slate-100">
-          <div className="max-w-md w-full bg-[#11141D] border border-slate-800 rounded-3xl p-6 sm:p-8 text-center shadow-2xl">
-            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto mb-4">
+        <div className="min-h-screen bg-[#15171C] flex items-center justify-center p-4 text-slate-100">
+          <div className="max-w-md w-full bg-[#1E2128] rounded-3xl p-6 sm:p-8 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-slate-800 text-amber-300 flex items-center justify-center mx-auto mb-4">
               <AlertTriangle size={28} />
             </div>
-            <h2 className="text-xl font-black text-white mb-2">Ops! Algo deu errado</h2>
+            <h2 className="text-xl font-semibold text-white mb-2">Ops! Algo deu errado</h2>
             <p className="text-xs text-slate-400 mb-6 leading-relaxed">
               O aplicativo encontrou uma oscilação temporária. Não se preocupe, seus dados financeiros estão protegidos.
             </p>
             <div className="space-y-3">
               <button
                 onClick={this.handleReload}
-                className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 font-bold text-sm text-white rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                className="w-full py-3 px-4 bg-slate-100 hover:bg-white font-bold text-sm text-slate-950 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
                 <RefreshCw size={16} />
                 <span>Recarregar Aplicativo</span>
               </button>
               <button
                 onClick={this.handleResetLocal}
-                className="w-full py-2.5 px-4 bg-[#0A0D14] hover:bg-slate-800 text-xs font-semibold text-slate-400 hover:text-slate-200 rounded-xl border border-slate-800 transition-all cursor-pointer"
+                className="w-full py-2.5 px-4 bg-[#15171C] hover:bg-slate-800 text-xs font-semibold text-slate-400 hover:text-slate-200 rounded-xl border border-slate-800 transition-all cursor-pointer"
               >
                 <span>Voltar para tela inicial</span>
               </button>

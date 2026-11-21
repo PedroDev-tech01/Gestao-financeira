@@ -67,16 +67,15 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 sm:gap-4">
         
         {/* 1. TOTAL DEVEDOR NO MOMENTO */}
-        <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-amber-900/40 hover:border-amber-500/40 hover:-translate-y-0.5 transition-all duration-200 shadow-md relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-2xl pointer-events-none -mr-8 -mt-8" />
+        <div className="bg-slate-900 rounded-2xl sm:rounded-3xl p-4 sm:p-5 transition-all duration-200 relative overflow-hidden">
           
           <div className="flex items-center justify-between mb-2.5 relative z-10">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-xs shadow-amber-500/50" />
+            <span className="text-xs font-bold  text-slate-300 flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-xs" />
               Total a Pagar no Momento
             </span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-amber-400 tracking-tight relative z-10 truncate">
+          <div className="text-2xl sm:text-3xl font-semibold text-amber-400 tracking-tight relative z-10 truncate">
             {hideBalance ? '••••••' : formatCurrency(totalRemaining)}
           </div>
           <p className="text-xs text-slate-400 mt-2 flex items-center gap-1 font-medium relative z-10">
@@ -86,16 +85,15 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
         </div>
 
         {/* 2. TOTAL JÁ PAGO / AMORTIZADO */}
-        <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-800/80 hover:border-emerald-500/40 hover:-translate-y-0.5 transition-all duration-200 shadow-md relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl pointer-events-none -mr-8 -mt-8" />
+        <div className="bg-slate-900 rounded-2xl sm:rounded-3xl p-4 sm:p-5 hover:border-emerald-500/40 hover:-translate-y-0.5 transition-all duration-200 relative overflow-hidden">
 
           <div className="flex items-center justify-between mb-2.5 relative z-10">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-xs shadow-emerald-500/50" />
+            <span className="text-xs font-bold  text-slate-300 flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-xs" />
               Total Já Quitado
             </span>
           </div>
-          <div className="text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight relative z-10 truncate">
+          <div className="text-2xl sm:text-3xl font-semibold text-emerald-400 tracking-tight relative z-10 truncate">
             {hideBalance ? '••••••' : formatCurrency(totalPaid)}
           </div>
           <p className="text-xs text-slate-400 mt-2 flex items-center gap-1 font-medium relative z-10">
@@ -105,9 +103,9 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
         </div>
 
         {/* 3. AÇÃO RÁPIDA DE CADASTRO */}
-        <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-2xl sm:rounded-3xl p-4 sm:p-5 border border-slate-800/80 flex flex-col justify-between shadow-md">
+        <div className="bg-slate-900 rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex flex-col justify-between">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1">
+            <span className="text-xs font-bold  text-slate-300 block mb-1">
               Controle de Compromissos
             </span>
             <p className="text-xs text-slate-400 leading-relaxed">
@@ -118,7 +116,7 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
 
           <button
             onClick={onOpenNewDebt}
-            className="mt-3.5 w-full py-2.5 px-3.5 bg-amber-600 hover:bg-amber-500 active:scale-[0.98] font-bold text-xs text-white rounded-xl shadow-md shadow-amber-950/40 transition-all flex items-center justify-center gap-2 cursor-pointer"
+            className="mt-3.5 w-full min-h-[44px] px-3.5 bg-slate-100 hover:bg-white active:scale-[0.98] font-semibold text-sm text-slate-950 rounded-full transition-all flex items-center justify-center gap-2 cursor-pointer"
           >
             <Plus size={15} />
             <span>Adicionar Dívida ou Empréstimo</span>
@@ -128,9 +126,9 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
       </div>
 
       {/* Helpful Friendly Explanatory Note with Clear Context */}
-      <div className="bg-gradient-to-r from-[#131A29] to-[#0E131F] rounded-2xl p-4 border border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+      <div className="bg-slate-900 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 mt-0.5">
+          <div className="w-9 h-9 rounded-xl bg-slate-800 text-amber-300 flex items-center justify-center shrink-0 mt-0.5">
             <Building2 size={18} />
           </div>
           <div>
@@ -144,7 +142,7 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
         </div>
 
         {/* Filter Toggle */}
-        <div className="flex items-center gap-1 bg-[#0A0D14] p-1 rounded-xl border border-slate-800/80 shrink-0 self-end sm:self-center">
+        <div className="flex items-center gap-1 bg-[#15171C] p-1 rounded-xl border border-slate-800/80 shrink-0 self-end sm:self-center">
           <button
             onClick={() => setFilter('active')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
@@ -190,7 +188,7 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
           {onClearSearch && (
             <button
               onClick={onClearSearch}
-              className="text-xs text-amber-300 hover:text-white px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors cursor-pointer shrink-0"
+              className="text-xs text-amber-300 hover:text-white px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded-full transition-colors cursor-pointer shrink-0"
             >
               Limpar busca
             </button>
@@ -200,8 +198,8 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
 
       {/* Debts List */}
       {displayedDebts.length === 0 ? (
-        <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-3xl p-8 border border-slate-800/80 text-center shadow-md">
-          <div className="w-12 h-12 rounded-2xl bg-slate-800/50 text-slate-400 flex items-center justify-center mx-auto mb-3 border border-slate-700/50 shadow-xs">
+        <div className="bg-slate-900 rounded-3xl p-8 text-center">
+          <div className="w-12 h-12 rounded-2xl bg-slate-800/50 text-slate-400 flex items-center justify-center mx-auto mb-3 border border-slate-700/50">
             <Building2 size={24} />
           </div>
           <h3 className="text-base font-bold text-slate-100 mb-1">
@@ -215,7 +213,7 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
           {filter !== 'paid' && (
             <button
               onClick={onOpenNewDebt}
-              className="px-4 py-2.5 text-xs font-bold text-white bg-amber-600 hover:bg-amber-500 rounded-xl transition-all shadow-md shadow-amber-950/40 cursor-pointer active:scale-[0.98]"
+              className="px-4 py-2.5 text-xs font-bold text-white bg-amber-600 hover:bg-amber-500 rounded-full transition-all shadow-md cursor-pointer active:scale-[0.98]"
             >
               + Adicionar Minha Primeira Dívida
             </button>
@@ -233,7 +231,7 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
             return (
               <div
                 key={debt.id}
-                className={`bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-3xl p-5 border transition-all duration-200 shadow-md flex flex-col justify-between hover:-translate-y-0.5 ${
+                className={`bg-slate-900 rounded-3xl p-5 border transition-all duration-200 flex flex-col justify-between hover:-translate-y-0.5 ${
                   isFullyPaid 
                     ? 'border-emerald-800/40' 
                     : 'border-slate-800/80 hover:border-amber-500/40'
@@ -288,18 +286,18 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
                   </div>
 
                   {/* Financial Values Display */}
-                  <div className="grid grid-cols-2 gap-2 p-3.5 bg-[#0A0D14] rounded-2xl border border-slate-800/80 mb-3">
+                  <div className="grid grid-cols-2 gap-2 p-3.5 bg-[#15171C] rounded-2xl mb-3">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                      <span className="text-[10px] font-bold  text-slate-400 block">
                         Falta Pagar
                       </span>
-                      <span className={`text-lg font-black ${isFullyPaid ? 'text-emerald-400' : 'text-amber-400'}`}>
+                      <span className={`text-lg font-semibold ${isFullyPaid ? 'text-emerald-400' : 'text-amber-400'}`}>
                         {hideBalance ? '••••••' : formatCurrency(remaining)}
                       </span>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
+                      <span className="text-[10px] font-bold  text-slate-400 block">
                         Valor Total Original
                       </span>
                       <span className="text-sm font-bold text-slate-300">
@@ -316,7 +314,7 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
                         {progressPercent}% pago ({formatCurrency(debt.paidAmount)})
                       </span>
                     </div>
-                    <div className="w-full bg-[#0A0D14] h-2.5 rounded-full overflow-hidden border border-slate-800 p-0.5">
+                    <div className="w-full bg-[#15171C] h-2.5 rounded-full overflow-hidden border border-slate-800 p-0.5">
                       <div
                         className={`h-full rounded-full transition-all duration-700 ${
                           isFullyPaid ? 'bg-emerald-500' : 'bg-amber-500'
@@ -349,7 +347,7 @@ export const DebtsArea: React.FC<DebtsAreaProps> = ({
                 {!isFullyPaid ? (
                   <button
                     onClick={() => onOpenPayDebt(debt)}
-                    className="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-emerald-950/40 flex items-center justify-center gap-1.5 cursor-pointer mt-2"
+                    className="w-full py-2.5 px-3 bg-slate-100 hover:bg-white active:scale-[0.98] text-slate-950 font-bold text-xs rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer mt-2"
                   >
                     <DollarSign size={14} />
                     <span>Abater / Pagar Valor Desta Dívida</span>

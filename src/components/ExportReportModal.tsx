@@ -112,15 +112,15 @@ export const ExportReportModal: React.FC<ExportReportModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-[#11141D] rounded-t-3xl sm:rounded-3xl max-w-lg w-full shadow-2xl border-t sm:border border-slate-800 overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[92vh]">
+      <div className="bg-[#1E2128] rounded-t-3xl sm:rounded-3xl max-w-lg w-full border-t sm: overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[92vh]">
         
         {/* Mobile pull indicator */}
         <div className="w-10 h-1 bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4.5 border-b border-slate-800 bg-[#0A0C10]">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4.5 border-b border-slate-800 bg-[#15171C]">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-slate-800 text-emerald-300 flex items-center justify-center">
               <FileText size={18} />
             </div>
             <div>
@@ -163,7 +163,7 @@ export const ExportReportModal: React.FC<ExportReportModalProps> = ({
               id="export-select-month"
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="w-full px-3 py-2 text-xs bg-[#0A0C10] border border-slate-800 rounded-xl font-medium text-slate-200 focus:outline-emerald-500 cursor-pointer"
+              className="w-full px-3 py-2 text-xs bg-[#15171C] border border-slate-800 rounded-xl font-medium text-slate-200 focus:outline-emerald-500 cursor-pointer"
             >
               {availableMonths.map(m => (
                 <option key={m} value={m}>
@@ -174,8 +174,8 @@ export const ExportReportModal: React.FC<ExportReportModalProps> = ({
           </div>
 
           {/* Metrics Preview */}
-          <div className="bg-[#0A0C10] p-4 rounded-2xl border border-slate-800/80">
-            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
+          <div className="bg-[#15171C] p-4 rounded-2xl">
+            <span className="text-[11px] font-bold text-slate-400  block mb-2">
               Resumo do Período ({filteredTransactions.length} lançamentos)
             </span>
 
@@ -206,10 +206,10 @@ export const ExportReportModal: React.FC<ExportReportModalProps> = ({
             <button
               onClick={handleExportPDF}
               disabled={isExporting}
-              className="w-full flex items-center justify-between p-3.5 bg-[#171B26] hover:bg-[#1E2333] border border-slate-700/80 rounded-2xl transition-all cursor-pointer group disabled:opacity-50"
+              className="w-full flex items-center justify-between p-3.5 bg-[#1E2128] hover:bg-[#2A2E37] border border-slate-700/80 rounded-2xl transition-all cursor-pointer group disabled:opacity-50"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400">
+                <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-rose-400">
                   <FileText size={20} />
                 </div>
                 <div className="text-left">
@@ -227,10 +227,10 @@ export const ExportReportModal: React.FC<ExportReportModalProps> = ({
             <button
               onClick={handleExportCSV}
               disabled={isExporting}
-              className="w-full flex items-center justify-between p-3.5 bg-[#171B26] hover:bg-[#1E2333] border border-slate-700/80 rounded-2xl transition-all cursor-pointer group disabled:opacity-50"
+              className="w-full flex items-center justify-between p-3.5 bg-[#1E2128] hover:bg-[#2A2E37] border border-slate-700/80 rounded-2xl transition-all cursor-pointer group disabled:opacity-50"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
+                <div className="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-emerald-400">
                   <FileSpreadsheet size={20} />
                 </div>
                 <div className="text-left">

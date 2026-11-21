@@ -252,61 +252,43 @@ export const TransactionList: React.FC<TransactionListProps> = ({
   const quickSearchTags = ['PIX', 'Cartão', 'Supermercado', 'Farmácia', 'Combustível', 'Restaurante'];
 
   return (
-    <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-3xl p-4 sm:p-6 border border-slate-800/80 shadow-md transition-all">
-      
-      {/* Top Controls Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800/80">
-        <div>
-          <h2 className="text-base sm:text-lg font-bold text-slate-100 flex items-center gap-2">
-            <Receipt size={18} className="text-emerald-400" />
-            <span>Extrato & Lançamentos</span>
-            {isSearchActive && (
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-950/70 text-emerald-300 border border-emerald-800/60 animate-in fade-in duration-200">
-                Busca ativa
-              </span>
-            )}
-          </h2>
-          <p className="text-xs text-slate-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
-            <span>
-              Mostrando <strong className="text-emerald-400 font-bold">{filteredTransactions.length}</strong> de {transactions.length} {transactions.length === 1 ? 'registro' : 'registros'}
-            </span>
-            {isSearchActive && (
-              <span className="text-slate-500">
-                (filtrado por &ldquo;<span className="text-slate-300 font-medium">{searchTerm}</span>&rdquo;)
-              </span>
-            )}
-          </p>
-        </div>
+    <section aria-label="Lançamentos" className="bg-slate-900 rounded-3xl p-4 sm:p-5">
 
-        <div className="flex items-center gap-2 self-start sm:self-auto flex-wrap">
-          {onClearAllTransactions && transactions.length > 0 && (
-            <button
-              id="btn-clear-account-txs"
-              onClick={onClearAllTransactions}
-              className="flex items-center gap-1.5 text-xs font-semibold text-rose-400 hover:text-rose-300 bg-[#0A0D14] hover:bg-rose-950/40 border border-slate-800/80 hover:border-rose-800/50 px-3 py-2 rounded-xl transition-all cursor-pointer shadow-xs active:scale-[0.98]"
-              title="Apagar todos os lançamentos desta conta atual"
-            >
-              <Trash2 size={13} />
-              <span>Limpar desta Conta</span>
-            </button>
-          )}
-
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-[15px] font-semibold text-slate-100">
+          Lançamentos
+          <span className="ml-2 font-normal text-slate-500 tabular-nums">
+            {isSearchActive ? `${filteredTransactions.length} de ${transactions.length}` : transactions.length}
+          </span>
+        </h2>
+        <div className="flex items-center gap-1">
           {onOpenExportModal && (
             <button
               id="btn-export-from-ledger"
               onClick={onOpenExportModal}
-              className="flex items-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-[#0A0D14] hover:bg-slate-800 border border-slate-800/80 px-3.5 py-2 rounded-xl transition-all cursor-pointer shadow-xs active:scale-[0.98]"
-              title="Exportar dados deste mês em PDF ou CSV"
+              className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-slate-100 hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Exportar este mês em PDF ou CSV"
+              aria-label="Exportar este mês em PDF ou CSV"
             >
-              <Download size={14} className="text-emerald-400" />
-              <span>Exportar Relatório</span>
+              <Download size={17} />
+            </button>
+          )}
+          {onClearAllTransactions && transactions.length > 0 && (
+            <button
+              id="btn-clear-account-txs"
+              onClick={onClearAllTransactions}
+              className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:text-rose-400 hover:bg-slate-800 transition-colors cursor-pointer"
+              title="Apagar todos os lançamentos desta conta"
+              aria-label="Apagar todos os lançamentos desta conta"
+            >
+              <Trash2 size={16} />
             </button>
           )}
         </div>
       </div>
 
       {/* Instant Search Bar & Filter Options */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 pt-4">
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-2.5 pt-3">
         
         {/* Instant Search Input */}
         <div className="relative flex-1 group">
@@ -320,13 +302,13 @@ export const TransactionList: React.FC<TransactionListProps> = ({
             ref={searchInputRef}
             id="search-transactions"
             type="text"
-            placeholder="Busca instantânea: nome, valor, PIX, farmácia, data... (Atalho: /)"
+            placeholder="Buscar por nome, valor ou data"
             value={searchTerm}
             onChange={(e) => handleSearchChange(e.target.value)}
-            className="w-full pl-9 pr-14 py-2.5 text-xs bg-[#0A0D14] border border-slate-800/80 rounded-xl text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/30 transition-all shadow-inner"
+            className="w-full pl-9 pr-12 min-h-[42px] text-sm bg-[#15171C] border border-transparent rounded-full text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-slate-700 transition-colors"
           />
 
-          <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex items-center gap-1">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
             {isSearchActive ? (
               <button
                 type="button"
@@ -345,75 +327,74 @@ export const TransactionList: React.FC<TransactionListProps> = ({
         </div>
 
         {/* Filter Pills - Responsive Flex Wrap */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-[#0A0D14] p-1.5 rounded-2xl border border-slate-800/80 w-full lg:w-auto">
+        <div className="flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-0.5 lg:pb-0 [scrollbar-width:none]">
           <button
             onClick={() => setTypeFilter('all')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            className={`shrink-0 px-3.5 min-h-[36px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               typeFilter === 'all'
-                ? 'bg-slate-800 text-white shadow-xs'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'bg-slate-100 text-slate-950'
+                : 'bg-[#15171C] text-slate-400 hover:text-slate-200'
             }`}
           >
             Todos
           </button>
           <button
             onClick={() => setTypeFilter('income')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            className={`shrink-0 px-3.5 min-h-[36px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               typeFilter === 'income'
-                ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-800/50 shadow-xs'
-                : 'text-slate-400 hover:text-emerald-400'
+                ? 'bg-slate-100 text-slate-950'
+                : 'bg-[#15171C] text-slate-400 hover:text-slate-200'
             }`}
           >
-            Receitas
+            Ganhos
           </button>
           <button
             onClick={() => setTypeFilter('expense')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            className={`shrink-0 px-3.5 min-h-[36px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               typeFilter === 'expense'
-                ? 'bg-rose-950/60 text-rose-300 border border-rose-800/50 shadow-xs'
-                : 'text-slate-400 hover:text-rose-400'
+                ? 'bg-slate-100 text-slate-950'
+                : 'bg-[#15171C] text-slate-400 hover:text-slate-200'
             }`}
           >
-            Despesas
+            Gastos
           </button>
           <button
             onClick={() => setTypeFilter('pending')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            className={`shrink-0 px-3.5 min-h-[36px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               typeFilter === 'pending'
-                ? 'bg-amber-950/60 text-amber-300 border border-amber-800/50 shadow-xs'
-                : 'text-slate-400 hover:text-amber-400'
+                ? 'bg-slate-100 text-slate-950'
+                : 'bg-[#15171C] text-slate-400 hover:text-slate-200'
             }`}
           >
-            Pendentes
+            A pagar
           </button>
           <button
             onClick={() => setTypeFilter('essential')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            className={`shrink-0 px-3.5 min-h-[36px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               typeFilter === 'essential'
-                ? 'bg-blue-950/60 text-blue-300 border border-blue-800/50 shadow-xs'
-                : 'text-slate-400 hover:text-blue-400'
+                ? 'bg-slate-100 text-slate-950'
+                : 'bg-[#15171C] text-slate-400 hover:text-slate-200'
             }`}
           >
-            📌 Essenciais (50%)
+            Essenciais
           </button>
           <button
             onClick={() => setTypeFilter('lifestyle')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all cursor-pointer ${
+            className={`shrink-0 px-3.5 min-h-[36px] rounded-full text-[13px] font-medium transition-colors cursor-pointer ${
               typeFilter === 'lifestyle'
-                ? 'bg-purple-950/60 text-purple-300 border border-purple-800/50 shadow-xs'
-                : 'text-slate-400 hover:text-purple-400'
+                ? 'bg-slate-100 text-slate-950'
+                : 'bg-[#15171C] text-slate-400 hover:text-slate-200'
             }`}
           >
-            ✨ Estilo de Vida (30%)
+            Estilo de vida
           </button>
         </div>
       </div>
 
       {/* Quick Search Tag Suggestions */}
-      <div className="flex items-center gap-1.5 mt-2.5 flex-wrap">
-        <span className="text-[11px] text-slate-500 font-medium mr-1 flex items-center gap-1">
-          <Sparkles size={11} className="text-emerald-400/80" />
-          <span>Filtros rápidos:</span>
+      <div className="hidden md:flex items-center gap-1.5 mt-2.5 flex-wrap">
+        <span className="text-xs text-slate-500 mr-1">
+          <span>Sugestões:</span>
         </span>
         {quickSearchTags.map(tag => {
           const isSelected = searchTerm.toLowerCase() === tag.toLowerCase();
@@ -422,10 +403,10 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               key={tag}
               type="button"
               onClick={() => handleSearchChange(isSelected ? '' : tag)}
-              className={`text-[11px] px-2.5 py-1 rounded-lg border transition-all cursor-pointer active:scale-95 ${
+              className={`text-xs px-3 min-h-[30px] rounded-full transition-colors cursor-pointer ${
                 isSelected
-                  ? 'bg-emerald-950/80 text-emerald-300 border-emerald-500/50 font-bold shadow-xs'
-                  : 'bg-[#0A0D14]/70 text-slate-400 hover:text-slate-200 border-slate-800/80 hover:border-slate-700/80'
+                  ? 'bg-slate-700 text-slate-100'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
               }`}
             >
               {tag}
@@ -446,7 +427,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
 
       {/* Live Financial Totals for Filtered Results */}
       {isSearchActive && filteredTransactions.length > 0 && (
-        <div className="mt-3 p-3 rounded-2xl bg-[#0A0D14] border border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs animate-in fade-in duration-150">
+        <div className="mt-3 p-3 rounded-2xl bg-[#15171C] flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs animate-in fade-in duration-150">
           <div className="flex items-center gap-2">
             <span className="text-slate-400 font-medium">Subtotal da busca:</span>
             <span className="font-bold text-slate-200">{filteredTransactions.length} resultado(s)</span>
@@ -473,21 +454,11 @@ export const TransactionList: React.FC<TransactionListProps> = ({
         </div>
       )}
 
-      {/* Helpful Eye-Friendly Micro-Tip */}
-      {filteredTransactions.length > 0 && !isSearchActive && (
-        <div className="mt-3 px-3 py-1.5 rounded-xl bg-[#0A0D14]/60 border border-slate-800/60 flex items-center gap-2 text-[11px] text-slate-400">
-          <Info size={13} className="text-emerald-400 shrink-0" />
-          <span>
-            <strong>Dica de uso:</strong> Toque no selo <span className="text-emerald-400 font-bold">Pago</span> ou <span className="text-amber-400 font-bold">A Pagar</span> para alternar o status do lançamento com 1 clique.
-          </span>
-        </div>
-      )}
-
       {/* Transactions List */}
-      <div className="mt-3 divide-y divide-slate-800/40">
+      <div className="mt-2 divide-y divide-slate-800/60">
         {filteredTransactions.length === 0 ? (
           <div className="py-12 text-center flex flex-col items-center justify-center animate-in fade-in duration-200">
-            <div className="w-12 h-12 rounded-2xl bg-slate-800/40 border border-slate-700/40 flex items-center justify-center text-slate-400 mb-3 shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-slate-800/40 border border-slate-700/40 flex items-center justify-center text-slate-400 mb-3">
               {isSearchActive ? <Search size={22} className="text-amber-400" /> : <Receipt size={22} />}
             </div>
             <p className="text-sm font-bold text-slate-200">
@@ -503,7 +474,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               <button
                 type="button"
                 onClick={handleClearSearch}
-                className="mt-4 px-4 py-2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition-all cursor-pointer flex items-center gap-1.5 active:scale-[0.98]"
+                className="mt-4 px-4 py-2 text-xs font-bold text-white bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-full transition-all cursor-pointer flex items-center gap-1.5 active:scale-[0.98]"
               >
                 <X size={14} className="text-rose-400" />
                 <span>Limpar busca (Esc)</span>
@@ -512,7 +483,7 @@ export const TransactionList: React.FC<TransactionListProps> = ({
               onOpenNewTransaction && (
                 <button
                   onClick={onOpenNewTransaction}
-                  className="mt-4 px-4 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all shadow-md shadow-emerald-950/40 cursor-pointer flex items-center gap-1.5 active:scale-[0.98]"
+                  className="mt-4 px-4 py-2 text-xs font-bold text-slate-950 bg-slate-100 hover:bg-white rounded-full transition-all shadow-md cursor-pointer flex items-center gap-1.5 active:scale-[0.98]"
                 >
                   <Plus size={14} />
                   <span>Adicionar Primeiro Lançamento</span>
@@ -524,44 +495,32 @@ export const TransactionList: React.FC<TransactionListProps> = ({
           filteredTransactions.map(t => {
             const cat = categoryMap.get(t.category);
             const isIncome = t.type === 'income';
-            const payInfo = t.paymentMethod ? PAYMENT_LABELS[t.paymentMethod] : null;
-
+            
             const statusButton = (extra: string) => (
               <button
                 onClick={() => onToggleStatus(t.id)}
-                className={`${extra} text-[10px] font-semibold px-2 py-1 rounded-md items-center gap-1 cursor-pointer transition-all border active:scale-95 min-h-[26px] shrink-0 ${
-                  t.status === 'paid'
-                    ? 'bg-emerald-950/60 text-emerald-300 border-emerald-500/30 hover:bg-emerald-900/60'
-                    : 'bg-amber-950/60 text-amber-300 border-amber-500/30 hover:bg-amber-900/60'
+                className={`${extra} text-[11px] font-medium px-2.5 rounded-full items-center gap-1 cursor-pointer transition-colors active:scale-95 min-h-[28px] shrink-0 bg-slate-800 hover:bg-slate-700 ${
+                  t.status === 'paid' ? 'text-slate-400' : 'text-amber-300'
                 }`}
                 title="Toque para alternar entre Pago e A Pagar"
               >
                 {t.status === 'paid' ? <CheckCircle2 size={12} /> : <Clock size={12} />}
-                <span>{t.status === 'paid' ? (isIncome ? 'Recebido' : 'Pago') : 'A Pagar'}</span>
+                <span>{t.status === 'paid' ? (isIncome ? 'Recebido' : 'Pago') : isIncome ? 'A receber' : 'A pagar'}</span>
               </button>
             );
 
-            const groupBadge = cat?.categoryGroup ? (
-              <span className={`hidden md:inline text-[10px] font-semibold px-1.5 py-px rounded border ${
-                cat.categoryGroup === 'essential'
-                  ? 'text-blue-400 bg-blue-950/40 border-blue-800/40'
-                  : (cat.categoryGroup === 'investment'
-                      ? 'text-emerald-400 bg-emerald-950/40 border-emerald-800/40'
-                      : (cat.categoryGroup === 'revenue' ? 'text-teal-400 bg-teal-950/40 border-teal-800/40' : 'text-purple-400 bg-purple-950/40 border-purple-800/40'))
-              }`}>
-                {cat.categoryGroup === 'essential' ? 'Essencial (50%)' : (cat.categoryGroup === 'investment' ? 'Reserva (20%)' : (cat.categoryGroup === 'revenue' ? 'Receita' : 'Estilo de Vida (30%)'))}
-              </span>
-            ) : null;
+            // Selo do grupo 50/30/20 fica só nos filtros, para a lista ficar limpa
+            const groupBadge = null;
 
             return (
               <div
                 key={t.id}
-                className="py-3 sm:py-3.5 flex items-center gap-3 group hover:bg-[#161F30]/50 px-1.5 sm:px-3 rounded-2xl transition-colors duration-150"
+                className="py-3 flex items-center gap-3 group transition-colors duration-150"
               >
                 {/* Ícone da categoria */}
                 <div
-                  className="w-10 h-10 rounded-2xl flex items-center justify-center text-white shrink-0 border border-white/10 shadow-xs"
-                  style={{ backgroundColor: cat ? cat.color : '#334155' }}
+                  className="w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 bg-slate-800"
+                  style={{ color: cat ? cat.color : '#9BA0A9' }}
                 >
                   <CategoryIcon iconName={cat ? cat.icon : 'Layers'} size={18} />
                 </div>
@@ -570,42 +529,44 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                   {/* Linha 1: descrição + selos | valor */}
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
-                      <HighlightMatch
-                        text={t.description}
-                        query={deferredSearchTerm}
-                        className="text-sm font-bold text-slate-100 truncate"
-                      />
+                      <button
+                        type="button"
+                        onClick={() => onEditTransaction(t)}
+                        className="min-w-0 text-left cursor-pointer hover:underline decoration-slate-600 underline-offset-4 flex"
+                        title="Editar lançamento"
+                      >
+                        <HighlightMatch
+                          text={t.description}
+                          query={deferredSearchTerm}
+                          className="text-[15px] font-medium text-slate-100 truncate"
+                        />
+                      </button>
                       {t.installmentInfo && (
-                        <span className="text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-md bg-indigo-950/70 text-indigo-300 border border-indigo-800/60 flex items-center gap-1 shrink-0">
-                          <Layers size={10} className="text-indigo-400" />
+                        <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 flex items-center gap-1 shrink-0 tabular-nums">
+                          <Layers size={10} className="text-slate-400" />
                           <span>{t.installmentInfo.current}/{t.installmentInfo.total}</span>
-                        </span>
-                      )}
-                      {payInfo && (
-                        <span className={`hidden sm:inline text-[10px] font-semibold px-2 py-0.5 rounded-md border shrink-0 ${payInfo.color}`}>
-                          {payInfo.label}
                         </span>
                       )}
                       {statusButton('hidden sm:flex')}
                     </div>
                     <span
-                      className={`text-sm sm:text-base font-black tracking-tight tabular-nums whitespace-nowrap shrink-0 ${
-                        isIncome ? 'text-emerald-400' : 'text-rose-400'
+                      className={`text-[15px] font-semibold tabular-nums whitespace-nowrap shrink-0 ${
+                        isIncome ? 'text-emerald-400' : 'text-slate-100'
                       }`}
                     >
-                      {hideBalance ? '••••••' : (isIncome ? `+ ${formatCurrency(t.amount)}` : `- ${formatCurrency(t.amount)}`)}
+                      {hideBalance ? '••••••' : (isIncome ? `+ ${formatCurrency(t.amount)}` : `− ${formatCurrency(t.amount)}`)}
                     </span>
                   </div>
 
                   {/* Linha 2: data • categoria | (celular) status + ações */}
                   <div className="flex items-center justify-between gap-2 mt-1">
-                    <div className="flex items-center gap-1.5 text-[11px] text-slate-400 min-w-0">
+                    <div className="flex items-center gap-1.5 text-[13px] text-slate-400 min-w-0">
                       <span className="shrink-0 tabular-nums">{formatDateBR(t.date).slice(0, 5)}<span className="hidden sm:inline">{formatDateBR(t.date).slice(5)}</span></span>
                       <span className="shrink-0">•</span>
                       <HighlightMatch
-                        text={t.category}
+                        text={t.category.split(/[,&/]/)[0].trim()}
                         query={deferredSearchTerm}
-                        className="text-slate-300 font-medium truncate"
+                        className="text-slate-400 truncate"
                       />
                       {groupBadge}
                       {t.notes && (
@@ -622,16 +583,8 @@ export const TransactionList: React.FC<TransactionListProps> = ({
                     <div className="flex sm:hidden items-center gap-0.5 shrink-0">
                       {statusButton('flex')}
                       <button
-                        onClick={() => onEditTransaction(t)}
-                        className="p-1 text-slate-400 hover:text-white rounded-lg cursor-pointer active:scale-90 min-h-[30px] min-w-[30px] flex items-center justify-center"
-                        title="Editar lançamento"
-                        aria-label="Editar lançamento"
-                      >
-                        <Edit2 size={14} />
-                      </button>
-                      <button
                         onClick={() => onDeleteTransaction(t.id)}
-                        className="p-1 text-slate-400 hover:text-rose-400 rounded-lg cursor-pointer active:scale-90 min-h-[30px] min-w-[30px] flex items-center justify-center"
+                        className="text-slate-500 hover:text-rose-400 rounded-full cursor-pointer active:scale-90 min-h-[36px] min-w-[36px] flex items-center justify-center"
                         title="Excluir lançamento"
                         aria-label="Excluir lançamento"
                       >
@@ -666,6 +619,6 @@ export const TransactionList: React.FC<TransactionListProps> = ({
         )}
       </div>
 
-    </div>
+    </section>
   );
 };
