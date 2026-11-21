@@ -34,12 +34,12 @@ export const ToastNotification: React.FC<ToastNotificationProps> = ({ toasts, on
         const isError = toast.type === 'error';
 
         const borderColor = isSuccess
-          ? 'border-emerald-500/50 bg-[#0C151A]/95 text-emerald-200'
+          ? 'border-emerald-500/50 bg-[#1A2622]/95 text-emerald-200'
           : isWarning
-          ? 'border-amber-500/50 bg-[#17130A]/95 text-amber-200'
+          ? 'border-amber-500/50 bg-[#2A251A]/95 text-amber-200'
           : isError
-          ? 'border-rose-500/50 bg-[#1A0C0E]/95 text-rose-200'
-          : 'border-slate-700 bg-[#0E131F]/95 text-slate-200';
+          ? 'border-rose-500/50 bg-[#2A1E1E]/95 text-rose-200'
+          : 'border-slate-700 bg-[#1E2128]/95 text-slate-200';
 
         const Icon = isSuccess ? CheckCircle2 : (isWarning || isError ? AlertTriangle : Info);
         const iconColor = isSuccess

@@ -42,14 +42,14 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
   };
 
   return (
-    <div className="mb-6 rounded-3xl bg-gradient-to-b from-[#141B29] to-[#0F1420] border border-slate-800/80 shadow-md overflow-hidden transition-all duration-300">
+    <div className="mb-6 rounded-3xl bg-slate-900 overflow-hidden transition-all duration-300">
       {/* Header bar of the guide */}
       <div 
         onClick={handleToggle}
         className="px-4 sm:px-5 py-3.5 flex items-center justify-between gap-3 cursor-pointer select-none hover:bg-slate-800/30 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-slate-800 text-emerald-300 flex items-center justify-center shrink-0">
             <Sparkles size={16} />
           </div>
           <div>
@@ -69,7 +69,7 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
 
         <button
           type="button"
-          className="shrink-0 flex items-center gap-1 text-xs font-semibold text-slate-400 hover:text-slate-200 bg-[#0A0D14] border border-slate-800/80 px-3 py-1.5 rounded-xl transition-colors cursor-pointer whitespace-nowrap"
+          className="shrink-0 flex items-center gap-1 text-xs font-semibold text-slate-400 hover:text-slate-200 bg-[#15171C] border border-slate-800/80 px-3 py-1.5 rounded-full transition-colors cursor-pointer whitespace-nowrap"
           aria-expanded={isOpen}
         >
           <span>{isOpen ? 'Ocultar' : 'Ver guia'}</span>
@@ -83,7 +83,7 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 pt-3">
             
             {/* Step 1: Entradas & Saídas */}
-            <div className="bg-[#0A0D14]/80 rounded-2xl p-4 border border-slate-800/80 flex flex-col justify-between hover:border-emerald-500/30 transition-all group">
+            <div className="bg-[#15171C]/80 rounded-2xl p-4 flex flex-col justify-between hover:border-emerald-500/30 transition-all group">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="w-8 h-8 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20">
@@ -120,7 +120,7 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
             </div>
 
             {/* Step 2: Parcelamento Automático */}
-            <div className="bg-[#0A0D14]/80 rounded-2xl p-4 border border-slate-800/80 flex flex-col justify-between hover:border-purple-500/30 transition-all group">
+            <div className="bg-[#15171C]/80 rounded-2xl p-4 flex flex-col justify-between hover:border-purple-500/30 transition-all group">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="w-8 h-8 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center border border-purple-500/20">
@@ -143,7 +143,7 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
             </div>
 
             {/* Step 3: Dívidas do Momento */}
-            <div className="bg-[#0A0D14]/80 rounded-2xl p-4 border border-slate-800/80 flex flex-col justify-between hover:border-amber-500/30 transition-all group">
+            <div className="bg-[#15171C]/80 rounded-2xl p-4 flex flex-col justify-between hover:border-amber-500/30 transition-all group">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20">
@@ -173,7 +173,7 @@ export const QuickGuideBanner: React.FC<QuickGuideBannerProps> = ({
             </div>
 
             {/* Step 4: Investimentos & Reserva */}
-            <div className="bg-[#0A0D14]/80 rounded-2xl p-4 border border-slate-800/80 flex flex-col justify-between hover:border-teal-500/30 transition-all group">
+            <div className="bg-[#15171C]/80 rounded-2xl p-4 flex flex-col justify-between hover:border-teal-500/30 transition-all group">
               <div>
                 <div className="flex items-center justify-between mb-2.5">
                   <div className="w-8 h-8 rounded-xl bg-teal-500/10 text-teal-400 flex items-center justify-center border border-teal-500/20">

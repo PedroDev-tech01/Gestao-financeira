@@ -201,14 +201,14 @@ export default function App() {
 
   if (!currentUser) {
     return (
-      <Suspense fallback={<div className="min-h-screen bg-[#0A0C10]" />}>
+      <Suspense fallback={<div className="min-h-screen bg-[#15171C]" />}>
         <LoginScreen onLoginSuccess={handleLoginSuccess} />
       </Suspense>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0C10] text-slate-100 antialiased font-sans pb-28 sm:pb-16 w-full max-w-full overflow-x-hidden">
+    <div className="min-h-screen bg-[#15171C] text-slate-100 antialiased font-sans pb-28 sm:pb-16 w-full max-w-full overflow-x-hidden">
       <ToastNotification toasts={toasts} onDismiss={removeToast} />
 
       {/* Sleek Minimal Header with Search, User CPF, Month Picker & Keyboard Shortcuts */}
@@ -256,23 +256,7 @@ export default function App() {
           <LocalAccountBanner isDemo={isDemoSession(currentUser)} onSaveToCloud={() => setIsMigrationOpen(true)} />
         )}
 
-        {/* Quick Guide Banner - Self-explanatory Onboarding */}
-        <QuickGuideBanner
-          onOpenNewIncome={() => handleOpenNewTransaction('income')}
-          onOpenNewExpense={() => handleOpenNewTransaction('expense')}
-          onOpenDebtsTab={() => setActiveTab('debts')}
-          onOpenInvestmentsTab={() => setActiveTab('investments')}
-          hasData={transactions.length > 0}
-        />
 
-        {/* Visual Due Dates & Bills Alert Banner */}
-        <DueAlertsBanner
-          reminders={dueReminders}
-          onOpenNotificationCenter={() => setIsNotificationCenterOpen(true)}
-          onPayDebt={handleOpenPayDebt}
-          onMarkExpensePaid={handleToggleTxStatus}
-          hideBalance={hideBalance}
-        />
 
         {searchQuery.trim() && <SearchBanner searchQuery={searchQuery} onClear={() => setSearchQuery('')} />}
 
@@ -311,6 +295,24 @@ export default function App() {
             handleClearAccountTransactions={handleClearAccountTransactions}
             openExport={() => setIsExportModalOpen(true)}
             goToTab={setActiveTab}
+            afterHero={
+              <DueAlertsBanner
+                reminders={dueReminders}
+                onOpenNotificationCenter={() => setIsNotificationCenterOpen(true)}
+                onPayDebt={handleOpenPayDebt}
+                onMarkExpensePaid={handleToggleTxStatus}
+                hideBalance={hideBalance}
+              />
+            }
+            footer={
+              <QuickGuideBanner
+                onOpenNewIncome={() => handleOpenNewTransaction('income')}
+                onOpenNewExpense={() => handleOpenNewTransaction('expense')}
+                onOpenDebtsTab={() => setActiveTab('debts')}
+                onOpenInvestmentsTab={() => setActiveTab('investments')}
+                hasData={transactions.length > 0}
+              />
+            }
           />
         )}
 

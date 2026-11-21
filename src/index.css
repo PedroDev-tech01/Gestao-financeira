@@ -1,5 +1,43 @@
 @import "tailwindcss";
 
+/*
+ * Tema Grafite
+ * Neutros sem tom azulado, um verde-menta para dinheiro que entra e um coral suave
+ * para o que sai. Os nomes "slate", "emerald" e "rose" foram mantidos para não
+ * precisar reescrever as classes de todos os componentes.
+ */
+@theme {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-slate-50: #F7F8F9;
+  --color-slate-100: #F2F3F5;
+  --color-slate-200: #E1E3E7;
+  --color-slate-300: #C5C9D0;
+  --color-slate-400: #9BA0A9;
+  --color-slate-500: #7E838D;
+  --color-slate-600: #5C616B;
+  --color-slate-700: #3A3E47;
+  --color-slate-800: #2A2E37;
+  --color-slate-900: #1E2128;
+  --color-slate-950: #15171C;
+
+  --color-emerald-50: #EAF8F1;
+  --color-emerald-100: #D3F1E3;
+  --color-emerald-200: #B7E8D2;
+  --color-emerald-300: #A6E3C8;
+  --color-emerald-400: #7FD1AE;
+  --color-emerald-500: #5FBF98;
+  --color-emerald-600: #2F8A66;
+  --color-emerald-700: #276F53;
+  --color-emerald-800: #1F5641;
+  --color-emerald-900: #173F30;
+  --color-emerald-950: #10291F;
+
+  --color-rose-300: #F7B8AB;
+  --color-rose-400: #F29C8B;
+  --color-rose-500: #E57F6C;
+}
+
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
@@ -8,8 +46,8 @@ html {
 }
 
 body {
-  background-color: #0A0D14;
-  color: #E2E8F0;
+  background-color: #15171C;
+  color: #F2F3F5;
   min-height: 100vh;
   margin: 0;
   padding: 0;
@@ -29,32 +67,32 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0A0D14;
+  background: #15171C;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #3A3E47;
   border-radius: 9999px;
-  border: 2px solid #0A0D14;
+  border: 2px solid #15171C;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #10B981;
+  background: #5C616B;
 }
 
 ::-webkit-scrollbar-thumb:active {
-  background: #059669;
+  background: #7E838D;
 }
 
 /* Firefox standard scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #334155 #0A0D14;
+  scrollbar-color: #3A3E47 #15171C;
 }
 
 /* Soft selection highlight */
 ::selection {
-  background-color: rgba(16, 185, 129, 0.25);
+  background-color: rgba(127, 209, 174, 0.28);
   color: #F8FAFC;
 }
 

@@ -56,10 +56,10 @@ export const CloudMigrationModal: React.FC<CloudMigrationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-sm">
-      <div className="bg-[#11141D] rounded-t-3xl sm:rounded-3xl max-w-md w-full shadow-2xl border-t sm:border border-slate-800/90 max-h-[92vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-[#0A0D14]/70">
+      <div className="bg-[#1E2128] rounded-t-3xl sm:rounded-3xl max-w-md w-full border-t sm: max-h-[92vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-[#15171C]/70">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-slate-800 text-emerald-300 flex items-center justify-center">
               <CloudUpload size={16} />
             </div>
             <div>
@@ -95,7 +95,7 @@ export const CloudMigrationModal: React.FC<CloudMigrationModalProps> = ({
               <button
                 type="button"
                 onClick={handleRetry}
-                className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 font-bold text-sm text-white rounded-xl flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3 px-4 bg-slate-100 hover:bg-white font-bold text-sm text-slate-950 rounded-xl flex items-center justify-center gap-2 cursor-pointer"
               >
                 <RotateCcw size={16} />
                 Tentar de novo
@@ -103,7 +103,7 @@ export const CloudMigrationModal: React.FC<CloudMigrationModalProps> = ({
             </div>
           ) : (
             <>
-              <div className="mb-5 p-3.5 bg-[#0A0C10] border border-slate-800 rounded-2xl text-xs text-slate-300 leading-relaxed flex gap-2.5">
+              <div className="mb-5 p-3.5 bg-[#15171C] rounded-2xl text-xs text-slate-300 leading-relaxed flex gap-2.5">
                 <ShieldCheck size={16} className="shrink-0 text-emerald-400 mt-0.5" />
                 <span>
                   Você tem <strong className="text-white">{itemCount} {itemCount === 1 ? 'item' : 'itens'}</strong> salvos

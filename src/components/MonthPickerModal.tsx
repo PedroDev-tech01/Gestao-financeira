@@ -47,15 +47,15 @@ export const MonthPickerModal: React.FC<MonthPickerModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-gradient-to-b from-[#141B29] to-[#0E131F] rounded-t-3xl sm:rounded-3xl max-w-sm w-full shadow-2xl border-t sm:border border-slate-800/90 overflow-hidden flex flex-col">
+      <div className="bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-sm w-full border-t sm: overflow-hidden flex flex-col">
         
         {/* Mobile drag handle */}
         <div className="w-10 h-1 bg-slate-700 rounded-full mx-auto my-2 sm:hidden" />
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-[#0A0D14]/70">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/80 bg-[#15171C]/70">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-xl bg-slate-800 text-emerald-300 flex items-center justify-center">
               <Calendar size={16} />
             </div>
             <div>
@@ -73,7 +73,7 @@ export const MonthPickerModal: React.FC<MonthPickerModalProps> = ({
         </div>
 
         {/* Year Selector Bar */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800/60 bg-[#0D121F]/60">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800/60 bg-[#1E2128]/60">
           <button
             onClick={() => setSelectedYear(y => y - 1)}
             className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer active:scale-95"
@@ -82,7 +82,7 @@ export const MonthPickerModal: React.FC<MonthPickerModalProps> = ({
             <ChevronLeft size={16} />
           </button>
           
-          <span className="text-sm font-black text-slate-200 tracking-wide">
+          <span className="text-sm font-semibold text-slate-200 tracking-wide">
             {selectedYear}
           </span>
 
@@ -105,12 +105,12 @@ export const MonthPickerModal: React.FC<MonthPickerModalProps> = ({
               <button
                 key={name}
                 onClick={() => handleSelect(index)}
-                className={`py-3 px-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center justify-center gap-1 cursor-pointer active:scale-95 relative ${
+                className={`py-3 px-2 rounded-full text-xs font-bold transition-all flex flex-col items-center justify-center gap-1 cursor-pointer active:scale-95 relative ${
                   isSelected
-                    ? 'bg-emerald-600 text-white shadow-md shadow-emerald-950/50'
+                    ? 'bg-slate-100 text-slate-950 shadow-md'
                     : isCurrentMonth
                     ? 'bg-slate-800/90 text-emerald-300 border border-emerald-500/40 hover:bg-slate-800'
-                    : 'bg-[#0A0D14] text-slate-300 hover:bg-slate-800 border border-slate-800/80 hover:text-white'
+                    : 'bg-[#15171C] text-slate-300 hover:bg-slate-800 border border-slate-800/80 hover:text-white'
                 }`}
               >
                 <span>{name}</span>
@@ -130,7 +130,7 @@ export const MonthPickerModal: React.FC<MonthPickerModalProps> = ({
         </div>
 
         {/* Footer with "Ir para o Mês Atual" shortcut */}
-        <div className="p-4 border-t border-slate-800/80 bg-[#0A0D14]/70 flex items-center justify-between">
+        <div className="p-4 border-t border-slate-800/80 bg-[#15171C]/70 flex items-center justify-between">
           <button
             onClick={handleGoToday}
             className="text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:underline cursor-pointer flex items-center gap-1"
@@ -140,7 +140,7 @@ export const MonthPickerModal: React.FC<MonthPickerModalProps> = ({
 
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-xl transition-colors cursor-pointer"
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 rounded-full transition-colors cursor-pointer"
           >
             Fechar
           </button>

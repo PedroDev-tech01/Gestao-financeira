@@ -70,7 +70,7 @@ export const PWAInstallButton: React.FC = () => {
       <button
         id="btn-pwa-install"
         onClick={handleInstallClick}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all cursor-pointer active:scale-95 shadow-xs"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/20 transition-all cursor-pointer active:scale-95 shadow-xs"
         title="Instalar aplicativo na tela inicial do seu celular ou tablet"
       >
         <Smartphone size={14} className="text-emerald-400" />
@@ -80,7 +80,7 @@ export const PWAInstallButton: React.FC = () => {
       {/* iOS Install Instructions Modal */}
       {showIOSModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-in fade-in">
-          <div className="w-full max-w-sm bg-[#111622] border border-slate-700/80 rounded-3xl p-6 text-slate-100 shadow-2xl relative">
+          <div className="w-full max-w-sm bg-[#1E2128] border border-slate-700/80 rounded-3xl p-6 text-slate-100 relative">
             <button
               onClick={() => setShowIOSModal(false)}
               className="absolute top-4 right-4 p-1.5 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
@@ -88,7 +88,7 @@ export const PWAInstallButton: React.FC = () => {
               <X size={18} />
             </button>
 
-            <div className="w-12 h-12 rounded-2xl overflow-hidden mb-4 border border-emerald-500/30 bg-[#0E131F]">
+            <div className="w-12 h-12 rounded-2xl overflow-hidden mb-4 border border-emerald-500/30 bg-[#1E2128]">
               <img src="/icon.svg" alt="App Icon" className="w-full h-full object-cover" referrerPolicy="no-referrer" />
             </div>
 
@@ -99,7 +99,7 @@ export const PWAInstallButton: React.FC = () => {
               Para instalar na sua tela inicial como um app nativo:
             </p>
 
-            <ol className="space-y-2 text-xs text-slate-300 list-decimal list-inside bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800 mb-5">
+            <ol className="space-y-2 text-xs text-slate-300 list-decimal list-inside bg-slate-900/60 p-3.5 rounded-2xl mb-5">
               <li>Toque no botão <strong>Compartilhar</strong> (ícone de quadrado com seta para cima) na barra inferior do Safari.</li>
               <li>Role para baixo e toque em <strong>"Adicionar à Tela de Início"</strong>.</li>
               <li>Confirme tocando em <strong>"Adicionar"</strong> no canto superior direito.</li>
@@ -107,7 +107,7 @@ export const PWAInstallButton: React.FC = () => {
 
             <button
               onClick={() => setShowIOSModal(false)}
-              className="w-full py-2.5 rounded-xl bg-emerald-500 text-[#0A0D14] font-bold text-xs hover:bg-emerald-400 transition-colors"
+              className="w-full py-2.5 rounded-xl bg-emerald-500 text-[#15171C] font-bold text-xs hover:bg-emerald-400 transition-colors"
             >
               Entendi
             </button>

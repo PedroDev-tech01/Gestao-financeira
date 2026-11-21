@@ -48,13 +48,13 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/75 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-gradient-to-b from-[#141B29] to-[#0E131F] rounded-t-3xl sm:rounded-3xl max-w-md w-full shadow-2xl border-t sm:border border-slate-800/90 overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[92vh]">
+      <div className="bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-md w-full border-t sm: overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[92vh]">
         
         {/* Mobile pull indicator */}
         <div className="w-10 h-1 bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-800/80 bg-[#0A0D14]/80">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-800/80 bg-[#15171C]/80">
           <div>
             <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
               <CheckCircle2 size={18} className="text-emerald-400" />
@@ -77,17 +77,17 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 pb-[max(env(safe-area-inset-bottom,0px),1.5rem)] space-y-4">
           
           {/* Status atual da dívida */}
-          <div className="p-4 bg-[#0A0D14] rounded-2xl border border-slate-800/80 flex items-center justify-between">
+          <div className="p-4 bg-[#15171C] rounded-2xl flex items-center justify-between">
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+              <span className="text-[11px] font-bold  text-slate-400 block">
                 Falta Pagar (Saldo Devedor)
               </span>
-              <span className="text-xl font-black text-amber-400">
+              <span className="text-xl font-semibold text-amber-400">
                 {formatCurrency(remaining)}
               </span>
             </div>
             <div className="text-right">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+              <span className="text-[11px] font-bold  text-slate-400 block">
                 Já Quitado
               </span>
               <span className="text-sm font-bold text-emerald-400">
@@ -98,11 +98,11 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
 
           {/* Valor a pagar agora */}
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-300 block mb-1.5">
+            <label className="text-xs font-bold  text-slate-300 block mb-1.5">
               Quanto você vai pagar agora?
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-black text-emerald-400">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-xl font-semibold text-emerald-400">
                 R$
               </span>
               <input
@@ -114,7 +114,7 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
                 placeholder="0,00"
                 value={payAmount}
                 onChange={(e) => setPayAmount(e.target.value)}
-                className="w-full pl-14 pr-4 py-3.5 text-2xl font-black bg-[#0A0D14] border border-slate-800 rounded-2xl text-emerald-300 focus:outline-none focus:border-emerald-500/60 transition-all placeholder:text-slate-600"
+                className="w-full pl-14 pr-4 py-3.5 text-2xl font-semibold bg-[#15171C] rounded-2xl text-emerald-300 focus:outline-none focus:border-emerald-500/60 transition-all placeholder:text-slate-600"
                 autoFocus
               />
             </div>
@@ -126,7 +126,7 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
                   key={amt}
                   type="button"
                   onClick={() => handleQuickAmount(amt)}
-                  className="px-2.5 py-1 text-xs font-bold bg-[#0A0D14] hover:bg-slate-800 text-slate-300 rounded-lg border border-slate-800 cursor-pointer transition-colors active:scale-95"
+                  className="px-2.5 py-1 text-xs font-bold bg-[#15171C] hover:bg-slate-800 text-slate-300 rounded-lg border border-slate-800 cursor-pointer transition-colors active:scale-95"
                 >
                   + R$ {amt}
                 </button>
@@ -142,7 +142,7 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
           </div>
 
           {/* Opção de lançar no extrato */}
-          <div className="p-3.5 bg-[#0A0D14] rounded-2xl border border-slate-800/80 space-y-2">
+          <div className="p-3.5 bg-[#15171C] rounded-2xl space-y-2">
             <label className="flex items-start gap-2.5 cursor-pointer select-none">
               <input
                 type="checkbox"
@@ -163,7 +163,7 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
 
           {/* Observação */}
           <div>
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-400 block mb-1">
+            <label className="text-xs font-bold  text-slate-400 block mb-1">
               Observação <span className="text-slate-500 font-normal">(opcional)</span>
             </label>
             <input
@@ -171,7 +171,7 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
               placeholder="Ex: Parcela 1 paga via PIX"
               value={paymentNote}
               onChange={(e) => setPaymentNote(e.target.value)}
-              className="w-full px-3.5 py-2 text-xs bg-[#0A0D14] border border-slate-800 rounded-xl text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60"
+              className="w-full px-3.5 py-2 text-xs bg-[#15171C] border border-slate-800 rounded-xl text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-emerald-500/60"
             />
           </div>
 
@@ -180,7 +180,7 @@ export const PayDebtModal: React.FC<PayDebtModalProps> = ({
             <button
               type="submit"
               disabled={numericPay <= 0}
-              className="w-full py-3.5 px-4 rounded-xl font-bold text-sm text-white bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-950/50 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
+              className="w-full py-3.5 px-4 rounded-full font-semibold text-sm text-slate-950 bg-slate-100 hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-[0.98]"
             >
               <span>Confirmar Pagamento de {formatCurrency(numericPay)}</span>
               <ArrowRight size={16} />

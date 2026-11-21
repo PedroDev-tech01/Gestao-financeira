@@ -134,13 +134,11 @@ export const FinancialEducationCard: React.FC<FinancialEducationCardProps> = ({
   const TipIcon = didacticTip.icon;
 
   return (
-    <div className="bg-gradient-to-b from-[#131A29] to-[#0E131F] rounded-3xl p-4 sm:p-5 border border-slate-800/80 shadow-md mb-6 relative overflow-hidden">
-      {/* Soft background ambient gradient */}
-      <div className="absolute top-0 right-0 w-48 h-48 bg-teal-500/5 rounded-full blur-3xl pointer-events-none -mr-12 -mt-12" />
+    <div className="bg-slate-900 rounded-3xl p-4 sm:p-5 mb-6 relative overflow-hidden">
 
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 relative z-10">
         <div className="flex items-start sm:items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0 shadow-xs">
+          <div className="w-10 h-10 rounded-2xl bg-slate-800 text-teal-300 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
             <TipIcon size={18} />
           </div>
           <div>
@@ -161,7 +159,7 @@ export const FinancialEducationCard: React.FC<FinancialEducationCardProps> = ({
         <button
           type="button"
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-[#0A0D14] hover:bg-slate-800 border border-slate-800/80 px-3 py-2 rounded-xl transition-all cursor-pointer shrink-0 self-start sm:self-auto active:scale-[0.98]"
+          className="flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-300 hover:text-white bg-[#15171C] hover:bg-slate-800 border border-slate-800/80 px-3 py-2 rounded-full transition-all cursor-pointer shrink-0 self-start sm:self-auto active:scale-[0.98]"
         >
           <PieChart size={14} className="text-teal-400" />
           <span>{isOpen ? 'Ocultar Regra 50/30/20' : 'Ver Diagnóstico 50/30/20'}</span>
@@ -173,7 +171,7 @@ export const FinancialEducationCard: React.FC<FinancialEducationCardProps> = ({
       {isOpen && (
         <div className="mt-4 pt-4 border-t border-slate-800/70 relative z-10 animate-in fade-in duration-200">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+            <span className="text-xs font-bold  text-slate-300 flex items-center gap-1.5">
               <Sparkles size={13} className="text-amber-400" />
               <span>Diagnóstico Didático: Para onde seu dinheiro está indo?</span>
             </span>
@@ -184,7 +182,7 @@ export const FinancialEducationCard: React.FC<FinancialEducationCardProps> = ({
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
             {/* 1. Essenciais (50%) */}
-            <div className="p-3.5 bg-[#0A0D14]/80 rounded-2xl border border-slate-800/90 flex flex-col justify-between">
+            <div className="p-3.5 bg-[#15171C]/80 rounded-2xl flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-xs font-bold text-slate-200">1. Necessidades Essenciais</span>
@@ -196,7 +194,7 @@ export const FinancialEducationCard: React.FC<FinancialEducationCardProps> = ({
                     {groupTotals.essentialPct}% <span className="text-slate-500 font-normal">/ meta 50%</span>
                   </span>
                 </div>
-                <div className="text-lg font-black text-slate-100">
+                <div className="text-lg font-semibold text-slate-100">
                   {hideBalance ? '••••••' : formatCurrency(groupTotals.essential)}
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
@@ -214,7 +212,7 @@ export const FinancialEducationCard: React.FC<FinancialEducationCardProps> = ({
             </div>
 
             {/* 2. Estilo de Vida (30%) */}
-            <div className="p-3.5 bg-[#0A0D14]/80 rounded-2xl border border-slate-800/90 flex flex-col justify-between">
+            <div className="p-3.5 bg-[#15171C]/80 rounded-2xl flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-xs font-bold text-slate-200">2. Estilo de Vida & Desejos</span>
@@ -226,7 +224,7 @@ export const FinancialEducationCard: React.FC<FinancialEducationCardProps> = ({
                     {groupTotals.lifestylePct}% <span className="text-slate-500 font-normal">/ meta 30%</span>
                   </span>
                 </div>
-                <div className="text-lg font-black text-slate-100">
+                <div className="text-lg font-semibold text-slate-100">
                   {hideBalance ? '••••••' : formatCurrency(groupTotals.lifestyle)}
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
@@ -244,7 +242,7 @@ export const FinancialEducationCard: React.FC<FinancialEducationCardProps> = ({
             </div>
 
             {/* 3. Futuro & Reserva (20%) */}
-            <div className="p-3.5 bg-[#0A0D14]/80 rounded-2xl border border-slate-800/90 flex flex-col justify-between">
+            <div className="p-3.5 bg-[#15171C]/80 rounded-2xl flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <span className="text-xs font-bold text-slate-200">3. Reserva & Poupança</span>
@@ -256,7 +254,7 @@ export const FinancialEducationCard: React.FC<FinancialEducationCardProps> = ({
                     {groupTotals.savingsPct}% <span className="text-slate-500 font-normal">/ meta 20%</span>
                   </span>
                 </div>
-                <div className="text-lg font-black text-emerald-400">
+                <div className="text-lg font-semibold text-emerald-400">
                   {hideBalance ? '••••••' : formatCurrency(groupTotals.totalSavingsAndInvest)}
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">

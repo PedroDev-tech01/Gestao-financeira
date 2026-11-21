@@ -108,22 +108,22 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-gradient-to-b from-[#141B29] to-[#0E131F] rounded-t-3xl sm:rounded-3xl max-w-xl w-full shadow-2xl border-t sm:border border-slate-800/90 overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[92vh]">
+      <div className="bg-slate-900 rounded-t-3xl sm:rounded-3xl max-w-xl w-full border-t sm: overflow-hidden flex flex-col max-h-[90vh] sm:max-h-[92vh]">
         
         {/* Mobile Drag Indicator */}
         <div className="w-10 h-1 bg-slate-700 rounded-full mx-auto my-2 sm:hidden shrink-0" />
 
         {/* Modal Header */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-800/80 bg-[#0A0D14]/80">
+        <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-slate-800/80 bg-[#15171C]/80">
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shadow-xs">
+            <div className="w-9 h-9 rounded-2xl bg-slate-800 text-amber-300 flex items-center justify-center">
               <Bell size={18} />
             </div>
             <div>
-              <h3 className="text-base font-black text-slate-100 flex items-center gap-2">
+              <h3 className="text-base font-semibold text-slate-100 flex items-center gap-2">
                 <span>Alertas & Vencimentos</span>
                 {reminders.length > 0 && (
-                  <span className="text-xs font-extrabold bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full shadow-xs">
+                  <span className="text-xs font-semibold bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full shadow-xs">
                     {reminders.length}
                   </span>
                 )}
@@ -155,7 +155,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
         </div>
 
         {/* Browser Push Notification Permission Banner */}
-        <div className="px-5 sm:px-6 py-3 bg-[#0A0D14] border-b border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
+        <div className="px-5 sm:px-6 py-3 bg-[#15171C] border-b border-slate-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5">
           <div className="flex items-center gap-2">
             <span className={`w-2.5 h-2.5 rounded-full ${permission === 'granted' ? 'bg-emerald-400 animate-pulse' : (permission === 'denied' ? 'bg-rose-500' : 'bg-amber-400')}`} />
             <span className="text-xs text-slate-300 font-semibold">
@@ -172,7 +172,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
               <button
                 onClick={handleTestNotification}
                 disabled={testNotificationSent}
-                className="text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-800/40 px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-50"
+                className="text-xs font-bold text-emerald-400 hover:text-emerald-300 bg-emerald-950/40 hover:bg-emerald-900/50 border border-emerald-800/40 px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer active:scale-95 disabled:opacity-50"
               >
                 <Send size={12} />
                 <span>{testNotificationSent ? 'Enviado!' : 'Testar Notificação'}</span>
@@ -180,7 +180,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
             ) : isNotificationSupported() && (
               <button
                 onClick={handleRequestPermission}
-                className="w-full sm:w-auto text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 px-3.5 py-1.5 rounded-xl transition-all shadow-md shadow-emerald-950/40 flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                className="w-full sm:w-auto text-xs font-bold text-slate-950 bg-slate-100 hover:bg-white px-3.5 py-1.5 rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
               >
                 <Bell size={13} />
                 <span>Ativar Notificações</span>
@@ -191,15 +191,15 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
 
         {/* Collapsible Settings Panel */}
         {showSettings && (
-          <div className="p-4 sm:p-5 bg-[#0D111A] border-b border-slate-800/80 space-y-3 animate-in fade-in">
+          <div className="p-4 sm:p-5 bg-[#15171C] border-b border-slate-800/80 space-y-3 animate-in fade-in">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <span className="text-xs font-bold  text-slate-400 flex items-center gap-1.5">
                 <Settings size={13} className="text-emerald-400" />
                 Preferências de Alertas
               </span>
               <button
                 onClick={() => handleToggleSetting('soundEnabled')}
-                className={`text-[11px] font-bold px-2.5 py-1 rounded-xl flex items-center gap-1 border transition-all cursor-pointer ${
+                className={`text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 border transition-all cursor-pointer ${
                   settings.soundEnabled
                     ? 'bg-emerald-950/40 text-emerald-300 border-emerald-800/40'
                     : 'bg-slate-900 text-slate-500 border-slate-800'
@@ -211,7 +211,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              <label className="flex items-center justify-between p-2.5 rounded-xl bg-[#0A0D14] border border-slate-800 cursor-pointer">
+              <label className="flex items-center justify-between p-2.5 rounded-xl bg-[#15171C] border border-slate-800 cursor-pointer">
                 <span className="text-slate-300">Avisar no dia do vencimento</span>
                 <input
                   type="checkbox"
@@ -221,7 +221,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
                 />
               </label>
 
-              <label className="flex items-center justify-between p-2.5 rounded-xl bg-[#0A0D14] border border-slate-800 cursor-pointer">
+              <label className="flex items-center justify-between p-2.5 rounded-xl bg-[#15171C] border border-slate-800 cursor-pointer">
                 <span className="text-slate-300">Avisar 3 dias antes</span>
                 <input
                   type="checkbox"
@@ -231,7 +231,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
                 />
               </label>
 
-              <label className="flex items-center justify-between p-2.5 rounded-xl bg-[#0A0D14] border border-slate-800 cursor-pointer">
+              <label className="flex items-center justify-between p-2.5 rounded-xl bg-[#15171C] border border-slate-800 cursor-pointer">
                 <span className="text-slate-300">Avisar 7 dias antes</span>
                 <input
                   type="checkbox"
@@ -241,7 +241,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
                 />
               </label>
 
-              <label className="flex items-center justify-between p-2.5 rounded-xl bg-[#0A0D14] border border-slate-800 cursor-pointer">
+              <label className="flex items-center justify-between p-2.5 rounded-xl bg-[#15171C] border border-slate-800 cursor-pointer">
                 <span className="text-slate-300">Avisar contas em atraso</span>
                 <input
                   type="checkbox"
@@ -258,10 +258,10 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
         <div className="px-5 sm:px-6 pt-3 pb-2 flex flex-wrap items-center gap-1.5 border-b border-slate-800/60">
           <button
             onClick={() => setActiveFilter('all')}
-            className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all cursor-pointer ${
+            className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all cursor-pointer ${
               activeFilter === 'all'
                 ? 'bg-slate-200 text-slate-900 shadow-sm'
-                : 'bg-[#0A0D14] text-slate-400 hover:text-slate-200 border border-slate-800'
+                : 'bg-[#15171C] text-slate-400 hover:text-slate-200 border border-slate-800'
             }`}
           >
             Todos ({reminders.length})
@@ -270,9 +270,9 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
           {overdueCount > 0 && (
             <button
               onClick={() => setActiveFilter('overdue')}
-              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeFilter === 'overdue'
-                  ? 'bg-rose-500 text-white shadow-sm shadow-rose-950/50'
+                  ? 'bg-rose-500 text-white shadow-sm'
                   : 'bg-rose-950/40 text-rose-300 border border-rose-800/40 hover:bg-rose-900/50'
               }`}
             >
@@ -284,9 +284,9 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
           {todayCount > 0 && (
             <button
               onClick={() => setActiveFilter('today')}
-              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeFilter === 'today'
-                  ? 'bg-amber-500 text-slate-950 shadow-sm shadow-amber-950/50'
+                  ? 'bg-amber-500 text-slate-950 shadow-sm'
                   : 'bg-amber-950/40 text-amber-300 border border-amber-800/40 hover:bg-amber-900/50'
               }`}
             >
@@ -298,7 +298,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
           {upcomingCount > 0 && (
             <button
               onClick={() => setActiveFilter('upcoming')}
-              className={`text-xs font-bold px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
+              className={`text-xs font-bold px-3 py-1.5 rounded-full transition-all flex items-center gap-1.5 cursor-pointer ${
                 activeFilter === 'upcoming'
                   ? 'bg-sky-500 text-slate-950 shadow-sm shadow-sky-950/50'
                   : 'bg-sky-950/40 text-sky-300 border border-sky-800/40 hover:bg-sky-900/50'
@@ -332,7 +332,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
               return (
                 <div
                   key={reminder.id}
-                  className={`p-4 rounded-2xl bg-gradient-to-r from-[#111624] to-[#0A0D14] border transition-all duration-200 hover:-translate-y-0.5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 ${
+                  className={`p-4 rounded-2xl bg-gradient-to-r from-[#1E2128] to-[#15171C] border transition-all duration-200 hover:-translate-y-0.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 ${
                     reminder.urgency === 'overdue'
                       ? 'border-rose-800/60 hover:border-rose-500/60'
                       : reminder.urgency === 'today'
@@ -387,10 +387,10 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
                   {/* Right: Amount & Quick Pay Action */}
                   <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-800/60 sm:border-0 shrink-0">
                     <div className="text-left sm:text-right">
-                      <span className="text-[10px] uppercase tracking-wider text-slate-500 block font-semibold">
+                      <span className="text-[10px]  text-slate-500 block font-semibold">
                         Valor
                       </span>
-                      <span className={`text-base font-black tracking-tight ${
+                      <span className={`text-base font-semibold tracking-tight ${
                         reminder.urgency === 'overdue' ? 'text-rose-400' : 'text-slate-100'
                       }`}>
                         {hideBalance ? '••••••' : formatCurrency(reminder.amount)}
@@ -404,7 +404,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
                             onClose();
                             onPayDebt(reminder.rawDebt!);
                           }}
-                          className="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-black text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                          className="px-3.5 py-2 bg-amber-600 hover:bg-amber-500 text-slate-950 font-semibold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
                           title="Abater ou quitar dívida"
                         >
                           <DollarSign size={13} />
@@ -415,7 +415,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
                           onClick={() => {
                             onMarkExpensePaid(reminder.sourceId);
                           }}
-                          className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
+                          className="px-3.5 py-2 bg-slate-100 hover:bg-white text-slate-950 font-bold text-xs rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer active:scale-95"
                           title="Marcar lançamento como pago"
                         >
                           <CheckCircle2 size={13} />
@@ -432,7 +432,7 @@ export const NotificationCenterModal: React.FC<NotificationCenterModalProps> = (
 
         {/* Modal Footer Summary */}
         {reminders.length > 0 && (
-          <div className="px-5 sm:px-6 py-3.5 bg-[#0A0D14]/90 border-t border-slate-800/80 flex items-center justify-between text-xs">
+          <div className="px-5 sm:px-6 py-3.5 bg-[#15171C]/90 border-t border-slate-800/80 flex items-center justify-between text-xs">
             <span className="text-slate-400">
               Total pendente nos alertas: <strong className="text-white font-bold">{hideBalance ? '••••••' : formatCurrency(totalAmountDue)}</strong>
             </span>
